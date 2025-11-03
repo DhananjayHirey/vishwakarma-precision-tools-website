@@ -14,7 +14,7 @@ connectDB()
             console.log("ERRR:", error);
         })
         app.listen(process.env.PORT || 8000, () => {
-            console.log(`Server listening on port ${process.env.PORT}`)
+            console.log(`Server listening on http://localhost:${process.env.PORT || 8000}`);
         })
     })
     .catch((error) => {
