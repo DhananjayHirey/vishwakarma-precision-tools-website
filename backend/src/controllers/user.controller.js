@@ -33,7 +33,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
     } catch (error) {
         console.log(error);
-        
+
         throw new ApiError(500, 'Something went wrong while generating access and refresh tokens')
     }
 }
@@ -42,17 +42,13 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
 
-    console.log(req);
-    const { name, username, email, password,role,address } = req.body;
+    // console.log(req);
+    const { name, username, email, password, address } = req.body;
     const addressObj = JSON.parse(address);
-    if (!name || !username || !email || !password || !role || !addressObj) {
-    throw new ApiError(400, "All fields are required");
-}
-
-
-    if(role!=="customer" && role!=="seller"){
-        throw new ApiError(400, "Invalid role");
+    if (!name || !username || !email || !password || !addressObj) {
+        throw new ApiError(400, "All fields are required");
     }
+
 
     const existedUser = await User.findOne({
         $or: [{ username }, { email }],
@@ -83,13 +79,13 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         password,
         cartItems: [],
-        addresses:[addressObj],
-        role
+        addresses: [addressObj],
+        role: "customer",
     });
 
     const createdUser = await User.findById(user._id).select("-password -refreshToken");
     console.log(createdUser);
-    
+
     if (!createdUser) {
         throw new ApiError(500, "User not created");
     }
@@ -176,7 +172,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
     console.log("refresh access token called");
-    
+
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
 
@@ -245,8 +241,8 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    console.log(req.user);
-    
+    // console.log(req.user);
+
     return res
         .status(200)
         .json(new ApiResponse(200, req.user, 'current user fetched successfully'))
@@ -255,17 +251,23 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
     const { name, email, username } = req.body;
-    if (!name || !email || !username) {
-        throw new ApiError(400, 'All fields are required');
+
+    const toUpdate = {};
+
+    if (name) toUpdate.name = name;
+    if (email) toUpdate.email = email;
+    if (username) toUpdate.username = username;
+
+    if (Object.keys(toUpdate).length === 0) {
+        throw new ApiError(400, 'At least one field is required to update');
     }
+
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                name: name,
-                email: email,
-                username: username
+                ...toUpdate
             }
         },
         { new: true }
@@ -317,7 +319,37 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
 })
 
+const addAddress = asyncHandler(async (req, res) => {
+    // console.log(req);
+    
+    let { address } = req.body;
 
+    if (!address) {
+        throw new ApiError(400, 'Address is required');
+    }
+
+    address = JSON.parse(address);
+
+    const user = await User.findById(req.user?._id);
+
+    if (user.addresses.length >= 5) {
+        throw new ApiError(400, 'Maximum address limit reached');
+    }
+
+    const hasAlreadyPrimaryAddress = user.addresses.some(addr => addr.isPrimary);
+
+    if(address.isPrimary && hasAlreadyPrimaryAddress){
+        throw new ApiError(400, 'Primary address already exists');
+    }
+
+    user.addresses.push(address);
+    await user.save({ validateBeforeSave: false });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user.addresses, 'Address added successfully'))
+
+})
 
 
 
@@ -331,4 +363,5 @@ export {
     changeCurrentPassword,
     updateAccountDetails,
     updateUserAvatar,
+    addAddress
 };
