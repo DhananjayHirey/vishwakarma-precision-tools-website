@@ -65,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const now = Date.now();
     const avatarFolder = `${APP_NAME}/avatars/${username}-${now}`;
     const avatarFileName = path.basename(avatarLocalPath);
-    const avatarResult = await uploadToCloudinary(avatarLocalPath, avatarFolder, avatarFileName, 'image');
+    const avatarResult = await uploadToCloudinary(avatarLocalPath, avatarFolder, avatarFileName, 'image', 'public');
 
     if (!avatarResult || !avatarResult.secure_url) {
         throw new ApiError(400, "Avatar upload failed");
@@ -291,7 +291,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
     const avatarFolder = `${APP_NAME}/avatars/${existingUser.username}-${now}`;
     const avatarFileName = path.basename(avatarLocalPath);
-    const avatarResult = await uploadToCloudinary(avatarLocalPath, avatarFolder, avatarFileName, 'image');
+    const avatarResult = await uploadToCloudinary(avatarLocalPath, avatarFolder, avatarFileName, 'image', 'public');
 
     if (!avatarResult || !avatarResult.secure_url) {
         throw new ApiError(400, 'Error while uploading Avatar');

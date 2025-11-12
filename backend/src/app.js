@@ -23,7 +23,9 @@ app.use(express.static("public"));
 app.use(cookieParser())
 
 import userRoutes from './routes/user.routes.js'
+import productRoutes from './routes/product.routes.js'
 app.use('/api/users',userRoutes)
+app.use('/api/products',productRoutes)
 
 app.use(errorMiddleware);
 

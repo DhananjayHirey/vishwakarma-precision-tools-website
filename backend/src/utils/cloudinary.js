@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
+import fs, { access } from 'fs';
 import path from 'path';
 import { ApiError } from './ApiError.js';
 import { ApiResponse } from './ApiResponse.js';
@@ -20,7 +20,7 @@ cloudinary.config({
 });
 
 
-export const uploadToCloudinary = async (localFilePath, folder, fileName, resource_type) => {
+export const uploadToCloudinary = async (localFilePath, folder, fileName, resource_type, access_mode) => {
     if (!localFilePath) return null;
 
     try {
@@ -41,6 +41,8 @@ export const uploadToCloudinary = async (localFilePath, folder, fileName, resour
             folder: folder,
             unique_filename: true,
             overwrite: false,
+
+            access_mode: access_mode || 'public',
         });
 
         console.log('✅ File uploaded successfully to Cloudinary:', result.secure_url);
@@ -98,3 +100,13 @@ export const deleteFileFromCloudinary = async (fileUrl) => {
         return null;
     }
 };
+
+
+export const getUrlFromCloudinaryPublicId = (publicId, resource_type = 'image') => {
+    const url = cloudinary.url(publicId, {
+        resource_type,
+        sign_url: true,
+        secure: true,
+    });
+    return url;
+}
