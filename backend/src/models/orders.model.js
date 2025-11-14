@@ -16,7 +16,7 @@ const orderSchema = mongoose.Schema({
   },
   orderDate: Date,
   expectedDateByClient: Date,
-  eta: Date,
+  eta: Date || null,
   paymentStatus: Boolean,
   totalBilling: Number,
   orderStatus: String,
