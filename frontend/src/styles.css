@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+
+
 
 @keyframes aurora {
   0% {
@@ -20,15 +23,11 @@
   /* overridden by inline style */
 }
 
-/* @import "tw-animate-css"; */
+@import "tw-animate-css";
 /* 
 ---break--- */
-/* @custom-variant dark (&:is(.dark *)); */
-/* 
-@import 'tw-animate-css';
-
 @custom-variant dark (&:is(.dark *));
-
+@custom-variant dark (&:is(.dark *));
 body {
   @apply m-0;
   font-family:
@@ -37,6 +36,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 
 code {
   font-family:
@@ -60,7 +60,7 @@ code {
   --accent-foreground: oklch(0.21 0.006 285.885);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
+  --border: oklch(91.973% 0.00413 285.946 / 0.263);
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.871 0.006 286.286);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -113,6 +113,7 @@ code {
   --sidebar-border: oklch(0.274 0.006 286.033);
   --sidebar-ring: oklch(0.442 0.017 285.786);
 }
+/* 
 
 @theme inline {
   --color-background: var(--background);
@@ -161,9 +162,10 @@ code {
     @apply bg-background text-foreground;
   }
 } */
+
 /* 
 ---break--- */
-/* @theme inline {
+ @theme inline {
   --animate-aurora: aurora 8s ease-in-out infinite alternate;
   @keyframes aurora {
   0% {
@@ -189,12 +191,11 @@ code {
   }
 }
 /* 
----break--- */
-/* @layer base {
+@layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
   }
-} */ 
+}  */

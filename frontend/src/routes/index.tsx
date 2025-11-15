@@ -4,6 +4,10 @@ import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
+import { MagicCard } from "@/components/ui/magic-card";
+import { ImageSlider } from "@/components/ImageSlider";
+import { GridPattern } from "@/components/ui/grid-pattern";
+import { DashboardGrid } from "@/components/DashboardGrid";
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -14,22 +18,28 @@ function App() {
     <>
       <ScrollProgress />
       <div className="text-center ">
-        {/* <div className="border-2 rounded-2xl overflow-hidden"> */}
         <div className="relative h-[500px] w-full overflow-hidden flex justify-center flex-col ">
-          <InteractiveGridPattern squares={[100, 100]} />
-          <AuroraText className="text-6xl font-bold mb-4">
-            Vishwakarma Precision Tools
-          </AuroraText>
-          <TextAnimate
-            animation="slideLeft"
-            by="character"
-            className="text-white text-4xl font-bold"
+          <GridPattern />
+          <MagicCard
+            className="p-16 pt-18 pb-18 w-[1000px] rounded-2xl mx-auto"
+            gradientColor="gray"
+            gradientOpacity={0.4}
           >
-            Precision Engineered for the Finest Details
-          </TextAnimate>
+            <AuroraText className="text-6xl font-bold mb-4">
+              Vishwakarma Precision Tools
+            </AuroraText>
+            <TextAnimate
+              animation="slideLeft"
+              by="character"
+              className="text-white text-4xl font-bold"
+            >
+              Precision Engineered for the Finest Details
+            </TextAnimate>
+          </MagicCard>
         </div>
-        {/* </div> */}
+        <DashboardGrid />
       </div>
+      <ImageSlider />
     </>
   );
 }
