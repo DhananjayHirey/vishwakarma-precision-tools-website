@@ -7,6 +7,7 @@ import { MagicCard } from "@/components/ui/magic-card";
 import { ImageSlider } from "@/components/ImageSlider";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { DashboardGrid } from "@/components/DashboardGrid";
+import AboutUs from "@/components/About";
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -40,6 +41,8 @@ function App() {
           <DashboardGrid />
         </div>
       </div>
+
+      <AboutUs />
 
       <TextAnimate className="text-center text-3xl text-zinc-300 font-bold">
         Our Customers
