@@ -4,55 +4,83 @@ import {
   FileTextIcon,
   GlobeIcon,
   InputIcon,
+  StarIcon,
 } from "@radix-ui/react-icons";
 
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { MailIcon, StoreIcon, Trophy, TrophyIcon } from "lucide-react";
 
 const features = [
   {
-    Icon: FileTextIcon,
-    name: "Save your files",
-    description: "We automatically save your files as you type.",
+    Icon: StoreIcon,
+    name: "Visit the Store",
+    description:
+      "Explore our collection and find everything you need in one place.",
     href: "/",
     cta: "Learn more",
-    background: <img className="absolute -top-20 -right-20 opacity-60" />,
+    background: (
+      <img
+        src="https://images.unsplash.com/photo-1522199710521-72d69614c702?q=80&w=1000"
+        className="w-full h-full object-cover"
+      />
+    ),
     className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
   },
   {
-    Icon: InputIcon,
-    name: "Full text search",
-    description: "Search through all your files in one place.",
+    Icon: TrophyIcon,
+    name: "Testimonials",
+    description: "Real stories from customers who love our products.",
     href: "/",
     cta: "Learn more",
-    background: <img className="absolute -top-20 -right-20 opacity-60" />,
+    background: (
+      <img
+        src="https://i.ibb.co/7JhQqvkq/IMG20160605153704.jpg"
+        className="w-full h-full object-cover"
+      />
+    ),
     className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
   },
   {
     Icon: GlobeIcon,
-    name: "Multilingual",
-    description: "Supports 100+ languages and counting.",
+    name: "Our Customers",
+    description: "Trusted by individuals and businesses across the globe.",
     href: "/",
     cta: "Learn more",
-    background: <img className="absolute -top-20 -right-20 opacity-60" />,
+    background: (
+      <img
+        src="https://i.ibb.co/yFm20bZy/business-people-handshake-successful-corporate-600nw-2421123259.webp"
+        className="w-full h-full object-cover"
+      />
+    ),
     className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
   },
   {
-    Icon: CalendarIcon,
-    name: "Calendar",
-    description: "Use the calendar to filter your files by date.",
+    Icon: MailIcon,
+    name: "Contact Us",
+    description:
+      "We’re here to help—reach out anytime for support or inquiries.",
     href: "/",
     cta: "Learn more",
-    background: <img className="absolute -top-20 -right-20 opacity-60" />,
+    background: (
+      <img
+        src="https://i.ibb.co/FkkxZTRB/istockphoto-2172494039-612x612.jpg"
+        className="w-full h-full object-cover"
+      />
+    ),
     className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
   },
   {
-    Icon: BellIcon,
-    name: "Notifications",
-    description:
-      "Get notified when someone shares a file or mentions you in a comment.",
+    Icon: StarIcon,
+    name: "Why Choose Us?",
+    description: "Exceptional quality, reliable service, and unmatched value.",
     href: "/",
     cta: "Learn more",
-    background: <img className="absolute -top-20 -right-20 opacity-60" />,
+    background: (
+      <img
+        src="https://i.ibb.co/BVnV4tH4/parts.jpg"
+        className="w-full h-full object-cover"
+      />
+    ),
     className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
   },
 ];
