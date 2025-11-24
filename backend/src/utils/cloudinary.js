@@ -41,7 +41,7 @@ export const uploadToCloudinary = async (localFilePath, folder, fileName, resour
             folder: folder,
             unique_filename: true,
             overwrite: false,
-
+            type: access_mode === 'authenticated' ? 'authenticated' : 'upload',
             access_mode: access_mode || 'public',
         });
 
@@ -62,6 +62,26 @@ export const uploadToCloudinary = async (localFilePath, folder, fileName, resour
         return null;
     }
 };
+
+
+export const getSignedUrlFromCloudinary = async (publicId, resource_type = 'image', access_mode = 'public') => {
+    if (!publicId) return null;
+    try {
+        const url = cloudinary.url(publicId, {
+            resource_type,
+            sign_url: 'authenticated',
+            secure: true,
+            type: access_mode === 'authenticated' ? 'authenticated' : 'upload',
+            
+        });
+        console.log('✅ Generated signed URL from Cloudinary:', url);
+        return url;
+        
+    } catch (error) {
+        console.error(`❌ Cloudinary get signed URL error for ${publicId}:`, error);
+        return null;
+    }
+}
 
 function extractPublicId(url) {
     // Remove everything before `/upload/`

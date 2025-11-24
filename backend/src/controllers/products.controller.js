@@ -1,22 +1,41 @@
+import { APP_NAME } from "../constants.js";
 import { Product } from "../models/product.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
+import path from "path";
+import { getSignedUrlFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
 const createProduct = asyncHandler(async (req, res) => {
-    const { name, description, price, image, stock, category } = req.body;
+    const { name, description, price, stock, category } = req.body;
 
-    if (!name || !description || !price || !image || stock === undefined || !category) {
+    if (!name || !description || !price || !stock || !category) {
         throw new ApiError(400, "Please fill all the fields");
     }
+    console.log(req.files);
 
+    const productImageLocalPath = req.file?.path;
+
+    if (!productImageLocalPath) {
+        throw new ApiError(400, "Product image is required");
+    }
+
+    const now = Date.now();
+    const productImageFolder = `${APP_NAME}/products/${name}-${now}`;
+    const productImageFileName = path.basename(productImageLocalPath);
+    const productImageResult = await uploadToCloudinary(productImageLocalPath, productImageFolder, productImageFileName, 'image', 'authenticated');
+
+
+
+    if (!productImageResult || !productImageResult.public_id) {
+        throw new ApiError(400, "Failed to upload product image");
+    }
     const product = await Product.create({
         name,
         description,
         price,
         category,
         stock,
-        image,
+        image: productImageResult.public_id,
     });
 
     if (!product) {
@@ -29,12 +48,48 @@ const createProduct = asyncHandler(async (req, res) => {
 })
 
 
+const getProductById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+
+    if (!product) {
+        throw new ApiError(404, "Product not found");
+    }
+
+    const signedImageUrl = await getSignedUrlFromCloudinary(product.image, 'image', 'authenticated');
+
+    const productWithSignedUrl = {
+        ...product.toObject(),
+        signedImageUrl
+    }
+    res
+        .status(200)
+        .json(new ApiResponse(200, productWithSignedUrl, "Product fetched successfully"));
+})
 
 const getAllProducts = asyncHandler(async (req, res) => {
     const products = await Product.find().sort({ createdAt: -1 });
+
+    const signedProducts = await Promise.all(
+        products.map(async (product) => {
+            const signedImageUrl = await getSignedUrlFromCloudinary(
+                product.image,
+                "image",
+                "authenticated"
+            );
+
+            return {
+                ...product.toObject(),
+                signedImageUrl
+            };
+        })
+    );
+
+
+
     res
         .status(200)
-        .json(new ApiResponse(200, products, "Products fetched successfully"));
+        .json(new ApiResponse(200, signedProducts, "Products fetched successfully"));
 })
 
 
@@ -88,4 +143,4 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, null, "Product deleted successfully"));
 })
-export { createProduct, getAllProducts, updateStock, deleteProduct, updateProductDetails };
+export { createProduct, getProductById,getAllProducts, updateStock, deleteProduct, updateProductDetails };
