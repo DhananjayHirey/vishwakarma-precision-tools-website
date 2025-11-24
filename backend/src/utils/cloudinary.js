@@ -130,3 +130,5 @@ export const getUrlFromCloudinaryPublicId = (publicId, resource_type = 'image') 
     });
     return url;
 }
+
+export default cloudinary;

@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import path from "path";
-import { getSignedUrlFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
+import cloudinary, { getSignedUrlFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
 const createProduct = asyncHandler(async (req, res) => {
     const { name, description, price, stock, category } = req.body;
 
@@ -139,8 +139,25 @@ const deleteProduct = asyncHandler(async (req, res) => {
     if (!product) {
         throw new ApiError(404, "Product not found");
     }
+    try {
+        console.log(`Deleting from Cloudinary: public_id=${product.image}`);
+        if (!product.image) {
+            console.error('No public_id provided for deletion');
 
+        }
+        else {
+            const result = await cloudinary.uploader.destroy(product.image, {
+                resource_type: 'image',
+            });
+            console.log('✅ Deleted from Cloudinary:', result);
+        }
+    } catch (error) {
+        console.error(`❌ Cloudinary deletion error:`, error);
+    }
 
     res.status(200).json(new ApiResponse(200, null, "Product deleted successfully"));
 })
-export { createProduct, getProductById,getAllProducts, updateStock, deleteProduct, updateProductDetails };
+
+
+
+export { createProduct, getProductById, getAllProducts, updateStock, deleteProduct, updateProductDetails };
