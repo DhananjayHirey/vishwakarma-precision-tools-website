@@ -1,6 +1,6 @@
-import { createRazorpayInstance } from "../config/razorpay.config";
+import { createRazorpayInstance } from "../config/razorpay.config.js";
 import crypto from "crypto";
-import { Product } from "../models/product.model";
+import { Product } from "../models/product.model.js";
 const razorpayInstance = createRazorpayInstance();
 
 // order format -->

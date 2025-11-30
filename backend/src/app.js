@@ -3,8 +3,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
-import dotenv from "dotenv";
-dotenv.config();
 const app = express();
 
 app.use(helmet());
