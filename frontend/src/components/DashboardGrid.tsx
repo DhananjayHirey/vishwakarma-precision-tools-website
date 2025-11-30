@@ -1,14 +1,7 @@
-import {
-  BellIcon,
-  CalendarIcon,
-  FileTextIcon,
-  GlobeIcon,
-  InputIcon,
-  StarIcon,
-} from "@radix-ui/react-icons";
+import { GlobeIcon, StarIcon } from "@radix-ui/react-icons";
 
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
-import { MailIcon, StoreIcon, Trophy, TrophyIcon } from "lucide-react";
+import { MailIcon, StoreIcon, TrophyIcon } from "lucide-react";
 
 const features = [
   {
