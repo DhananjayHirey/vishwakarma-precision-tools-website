@@ -35,7 +35,7 @@ function RouteComponent() {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/payments/createOrder",
-        orderObject
+        { orderObject }
       );
       const data = res.data;
       console.log(data);

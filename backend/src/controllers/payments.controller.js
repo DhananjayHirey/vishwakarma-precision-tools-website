@@ -12,14 +12,19 @@ const razorpayInstance = createRazorpayInstance();
 // ]
 
 export const createOrder = async (req, res) => {
+  // console.log(res);
+  // return;
+
   const { orderObject } = req.body;
+  console.log(orderObject);
   // calculate amount
   let amount = 0.0;
   try {
     for (let i = 0; i < orderObject.length; i += 1) {
       let prodPrice = await Product.findById(orderObject[i]?.productId);
-      prodPrice *= orderObject[i].quantity;
-      amount += prodPrice;
+      let price = prodPrice.price;
+      price *= orderObject[i].quantity;
+      amount += price;
     }
   } catch (e) {
     return res.status(500).json({
