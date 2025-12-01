@@ -48,6 +48,7 @@ export function RippleButton({
         "relative overflow-hidden rounded-lg px-4 py-2 bg-primary text-primary-foreground transition active:scale-[0.98]",
         className
       )}
+      type="button"
       style={{ "--duration": `${duration}ms` }}
     >
       <span className="relative z-10">{children}</span>
