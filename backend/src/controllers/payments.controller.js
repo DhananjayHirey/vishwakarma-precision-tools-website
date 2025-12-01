@@ -1,6 +1,7 @@
 import { createRazorpayInstance } from "../config/razorpay.config.js";
 import crypto from "crypto";
 import { Product } from "../models/product.model.js";
+import { calculatePrice } from "../utils/calculatePrice.js";
 const razorpayInstance = createRazorpayInstance();
 
 // order format -->
@@ -16,20 +17,13 @@ export const createOrder = async (req, res) => {
   // return;
 
   const { orderObject } = req.body;
-  console.log(orderObject);
+  // console.log(orderObject);
   // calculate amount
-  let amount = 0.0;
-  try {
-    for (let i = 0; i < orderObject.length; i += 1) {
-      let prodPrice = await Product.findById(orderObject[i]?.productId);
-      let price = prodPrice.price;
-      price *= orderObject[i].quantity;
-      amount += price;
-    }
-  } catch (e) {
+  const amount = await calculatePrice(orderObject);
+  if (amount === NaN) {
     return res.status(500).json({
       success: false,
-      message: "Some error occured in placing the order...",
+      message: "Some error occured while placing the order please try again",
     });
   }
 

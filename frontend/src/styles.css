@@ -217,3 +217,19 @@ code {
     @apply bg-background text-foreground;
   }
 } */
+
+@theme inline {
+  --animate-rippling: rippling var(--duration, 600ms) ease-out;
+
+  @keyframes rippling {
+    0% {
+      opacity: 1;
+      transform: scale(0);
+    }
+
+    100% {
+      opacity: 0;
+      transform: scale(2);
+    }
+  }
+}
