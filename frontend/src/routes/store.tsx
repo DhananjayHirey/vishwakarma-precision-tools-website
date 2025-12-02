@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "sonner";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/AppSideBar";
 export const Route = createFileRoute("/store")({
   component: RouteComponent,
 });
@@ -11,9 +14,28 @@ interface Item {
 }
 
 function RouteComponent() {
+  const [productsData, setProductsData] = useState([]);
   const [productId, setProductId] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
+  const [category, setCategory] = useState<any>([]);
+  const getProducts = async () => {
+    const url = import.meta.env.VITE_SERVER_URL;
+    const res = await fetch(url + "/api/products", {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .catch((e) =>
+        toast.error("Some error occurred while fetching products!")
+      );
+    // setProductsData(res.json()?.data)
+    if (res?.success) {
+      setProductsData(res.data);
+    } else {
+      return toast.error("Some error occurred while fetching products!");
+    }
+  };
 
   const loadScript = (src: string) => {
     return new Promise((resolve) => {
@@ -74,7 +96,13 @@ function RouteComponent() {
 
   useEffect(() => {
     loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    getProducts();
   }, []);
+
+  useEffect(() => {
+    const cat = [...new Set(productsData.map((p) => p?.category))];
+    setCategory(cat);
+  }, [productsData]);
 
   function handleAdd() {
     if (!productId || !quantity) return alert("Enter both fields!");
@@ -88,49 +116,59 @@ function RouteComponent() {
 
   return (
     <>
-      <div style={{ padding: "20px" }}>
-        <h2 className="text-white">Add Product</h2>
+      <SidebarProvider>
+        <AppSidebar prodCategories={category} />
+        <SidebarTrigger className="bg-white" />
+        <div style={{ padding: "20px" }}>
+          {productsData.length > 0 &&
+            productsData?.map((prod) => (
+              <div>
+                <p className="text-white">{prod?.name}</p>
+              </div>
+            ))}
+          <h2 className="text-white">Add Product</h2>
 
-        <input
-          type="text"
-          className="text-white border-2 border-zinc-100 rounded-md p-2"
-          placeholder="Product ID"
-          value={productId}
-          onChange={(e) => setProductId(e.target.value)}
-          style={{ marginRight: "10px" }}
-        />
+          <input
+            type="text"
+            className="text-white border-2 border-zinc-100 rounded-md p-2"
+            placeholder="Product ID"
+            value={productId}
+            onChange={(e) => setProductId(e.target.value)}
+            style={{ marginRight: "10px" }}
+          />
 
-        <input
-          type="number"
-          className="text-white border-2 border-zinc-100 rounded-md p-2"
-          placeholder="Quantity"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.valueAsNumber)}
-          style={{ marginRight: "10px" }}
-        />
+          <input
+            type="number"
+            className="text-white border-2 border-zinc-100 rounded-md p-2"
+            placeholder="Quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.valueAsNumber)}
+            style={{ marginRight: "10px" }}
+          />
 
-        <button
-          className="text-white border-2 border-zinc-100 rounded-md p-2 cursor-pointer"
-          onClick={handleAdd}
-        >
-          Add
-        </button>
+          <button
+            className="text-white border-2 border-zinc-100 rounded-md p-2 cursor-pointer"
+            onClick={handleAdd}
+          >
+            Add
+          </button>
 
-        <h3 className="text-white">Items Added:</h3>
-        <ul>
-          {items.map((item, idx) => (
-            <li className="text-white" key={idx}>
-              Product ID: {item.productId} — Quantity: {item.quantity}
-            </li>
-          ))}
-        </ul>
-        <button
-          className="border-2 bg-white text-black font-bold p-2 rounded-md cursor-pointer"
-          onClick={() => onPayment(items)}
-        >
-          Proceed to Payment
-        </button>
-      </div>
+          <h3 className="text-white">Items Added:</h3>
+          <ul>
+            {items.map((item, idx) => (
+              <li className="text-white" key={idx}>
+                Product ID: {item.productId} — Quantity: {item.quantity}
+              </li>
+            ))}
+          </ul>
+          <button
+            className="border-2 bg-white text-black font-bold p-2 rounded-md cursor-pointer"
+            onClick={() => onPayment(items)}
+          >
+            Proceed to Payment
+          </button>
+        </div>
+      </SidebarProvider>
     </>
   );
 }

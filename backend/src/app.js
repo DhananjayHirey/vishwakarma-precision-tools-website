@@ -8,6 +8,8 @@ app.use(
   cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -21,7 +23,6 @@ app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
-app.use(errorMiddleware);
 
 import userRoutes from "./routes/user.routes.js";
 import productRoutes from "./routes/product.routes.js";
@@ -31,5 +32,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", adminOrderRoutes);
 app.use("/api/payments", paymentsRoutes);
+app.use(errorMiddleware);
 
 export default app;

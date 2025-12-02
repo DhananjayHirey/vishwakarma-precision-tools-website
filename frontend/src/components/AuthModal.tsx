@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { RippleButton } from "./ui/ripple-button";
+import { toast } from "sonner";
 
 function AuthModal({ setAuthModalVisible, authModalVisible }) {
   const [isLoginForm, setIsLoginForm] = useState(true);
@@ -46,8 +47,41 @@ function AuthModal({ setAuthModalVisible, authModalVisible }) {
     console.log(data);
   };
 
-  function handleLogin() {
-    throw new Error("Function not implemented.");
+  async function handleLogin() {
+    // throw new Error("Function not implemented.");
+
+    return toast.promise(
+      () =>
+        new Promise(async (resolve, reject) => {
+          try {
+            const res = await fetch(
+              import.meta.env.VITE_SERVER_URL + "/api/users/login",
+              {
+                method: "POST",
+                body: JSON.stringify({ email: email, password: password }),
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+              }
+            );
+
+            if (!res.ok) {
+              const err = await res.json();
+              return reject(err.message || "Login failed");
+            }
+
+            const data = await res.json();
+            console.log(data);
+            resolve(data); // data will reach success callback
+          } catch (error) {
+            reject("Network error");
+          }
+        }),
+      {
+        loading: "Logging in...",
+        success: (data) => `Welcome back, ${data.user?.name || "User"}!`,
+        error: (err) => err || "Login failed",
+      }
+    );
   }
 
   async function handleRegister() {
@@ -108,11 +142,13 @@ function AuthModal({ setAuthModalVisible, authModalVisible }) {
               type="text"
               placeholder="Email"
               className="p-2 rounded-lg   border-2 border-black mb-8  focus:bg-zinc-300"
+              onChange={(e) => setEmail(e.target.value)}
             />
             <Input
               type="password"
               placeholder="Password"
               className="p-2 rounded-lg   border-2 border-black mb-8 focus:bg-zinc-300"
+              onChange={(e) => setPassword(e.target.value)}
             />
             {/* <button className="bg-zinc-900 text-zinc-50 p-3 rounded-lg">
               Login

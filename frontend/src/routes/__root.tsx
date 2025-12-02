@@ -3,11 +3,13 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import Header from "../components/Header";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRoute({
   component: () => (
     <>
       <Header />
+      <Toaster />
       <Outlet />
 
       <TanStackDevtools
