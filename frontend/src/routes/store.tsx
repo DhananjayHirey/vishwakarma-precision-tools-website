@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSideBar";
+import ProductCard from "@/components/ProductCard";
 export const Route = createFileRoute("/store")({
   component: RouteComponent,
 });
@@ -119,13 +120,20 @@ function RouteComponent() {
       <SidebarProvider>
         <AppSidebar prodCategories={category} />
         <SidebarTrigger className="bg-white" />
-        <div style={{ padding: "20px" }}>
+        <div className="grid grid-cols-3 space-x-4 mt-12">
           {productsData.length > 0 &&
             productsData?.map((prod) => (
-              <div>
-                <p className="text-white">{prod?.name}</p>
-              </div>
+              <ProductCard
+                imageUri={"https://i.ibb.co/qM1kdnbt/517-BP179xk-L-UL500.jpg"}
+                stock={prod.stock}
+                price={prod.price}
+                name={prod.name}
+                description={prod.description}
+                category={prod.category}
+              />
             ))}
+        </div>
+        {/* <div>
           <h2 className="text-white">Add Product</h2>
 
           <input
@@ -167,7 +175,7 @@ function RouteComponent() {
           >
             Proceed to Payment
           </button>
-        </div>
+        </div> */}
       </SidebarProvider>
     </>
   );
