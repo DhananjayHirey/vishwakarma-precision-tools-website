@@ -17,9 +17,9 @@ export const createOrder = async (req, res) => {
   // return;
 
   const { orderObject } = req.body;
-  // console.log(orderObject);
   // calculate amount
   const amount = await calculatePrice(orderObject);
+  // console.log(amount);
   if (amount === NaN) {
     return res.status(500).json({
       success: false,

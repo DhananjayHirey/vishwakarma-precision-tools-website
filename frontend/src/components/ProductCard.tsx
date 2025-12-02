@@ -1,35 +1,29 @@
 import React from "react";
 import { Separator } from "./ui/separator";
+import { DrawerTrigger } from "./ui/drawer";
 
 interface ProductCardProps {
   imageUri: string;
-  name: string;
-  description: string;
-  stock: number;
-  category: string;
-  price: number;
+  prod: any;
+  setSelectedProduct: (p: any) => void;
 }
 
-function ProductCard({
-  imageUri,
-  name,
-  description,
-  stock,
-  price,
-  category,
-}: ProductCardProps) {
+function ProductCard({ imageUri, prod, setSelectedProduct }: ProductCardProps) {
   return (
     <>
       <div className="rounded-2xl bg-white max-h-fit w-72 overflow-hidden">
         <img src={imageUri} alt="" className="w-full object-cover" />
         <p className="mx-auto text-center border-2 border-zinc-500 px-2 bg-zinc-200 max-w-fit rounded-full hover:bg-zinc-300    ">
-          {category}
+          {prod.category}
         </p>
-        <p className="font-bold text-2xl text-center mb-4">{name}</p>
+        <p className="font-bold text-2xl text-center mb-4">{prod.name}</p>
         {/* <div className="border-2 w-full" /> */}
         <div className="flex justify-between mx-4 my-4">
-          <p className="text-2xl">Rs. {price}/pc</p>
-          <button>Add to cart</button>
+          <p className="text-2xl">Rs. {prod.price}/pc</p>
+          {/* <button>Add to cart</button> */}
+          <DrawerTrigger onClick={() => setSelectedProduct(prod)}>
+            View Details
+          </DrawerTrigger>
         </div>
 
         {/* <p>{imageUri}</p> */}

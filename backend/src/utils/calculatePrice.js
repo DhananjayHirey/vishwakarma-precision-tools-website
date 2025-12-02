@@ -4,7 +4,7 @@ export const calculatePrice = async (orderObject) => {
   let amount = 0.0;
   try {
     for (let i = 0; i < orderObject.length; i += 1) {
-      let prodPrice = await Product.findById(orderObject[i]?.productId);
+      let prodPrice = await Product.findById(orderObject[i]?.product);
       let price = prodPrice.price;
       price *= orderObject[i].quantity;
       amount += price;
