@@ -1,14 +1,8 @@
-import {
-  BellIcon,
-  CalendarIcon,
-  FileTextIcon,
-  GlobeIcon,
-  InputIcon,
-  StarIcon,
-} from "@radix-ui/react-icons";
+import { GlobeIcon, StarIcon } from "@radix-ui/react-icons";
 
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
-import { MailIcon, StoreIcon, Trophy, TrophyIcon } from "lucide-react";
+import { MailIcon, StoreIcon, TrophyIcon } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 const features = [
   {
@@ -16,7 +10,7 @@ const features = [
     name: "Visit the Store",
     description:
       "Explore our collection and find everything you need in one place.",
-    href: "/",
+    href: "/store",
     cta: "Learn more",
     background: (
       <img
@@ -86,10 +80,15 @@ const features = [
 ];
 
 export function DashboardGrid() {
+  const navigate = useNavigate();
   return (
     <BentoGrid className="lg:grid-rows-3">
       {features.map((feature) => (
-        <BentoCard key={feature.name} {...feature} />
+        <BentoCard
+          key={feature.name}
+          {...feature}
+          onClick={() => navigate({ to: feature.href })}
+        />
       ))}
     </BentoGrid>
   );

@@ -8,15 +8,26 @@ import { ImageSlider } from "@/components/ImageSlider";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { DashboardGrid } from "@/components/DashboardGrid";
 import AboutUs from "@/components/About";
+import { useState } from "react";
+import AuthModal from "@/components/AuthModal";
 
 export const Route = createFileRoute("/")({
   component: App,
 });
 
 function App() {
+  const [authModalVisible, setAuthModalVisible] = useState(true);
   return (
     <>
       <ScrollProgress />
+      {authModalVisible && (
+        <div className="fixed inset-0 bg-[#00000080]  flex items-center justify-center z-50">
+          <AuthModal
+            authModalVisible={authModalVisible}
+            setAuthModalVisible={setAuthModalVisible}
+          />
+        </div>
+      )}
       <div className="text-center ">
         <div className="relative h-[500px] w-full overflow-hidden flex justify-center flex-col ">
           <GridPattern />
