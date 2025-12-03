@@ -7,6 +7,9 @@ import {
   getProductById,
   updateProductDetails,
   updateStock,
+  addToCart,
+  removeFromCart,
+  getCart,
 } from "../controllers/products.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
@@ -24,5 +27,9 @@ router
   .delete(verifyJWT, adminRoute, deleteProduct)
   .get(verifyJWT, getProductById);
 router.route("/:id/stock").patch(verifyJWT, adminRoute, updateStock);
+
+router.route("/addToCart").post(verifyJWT, addToCart);
+router.route("/removeFromCart").post(verifyJWT, removeFromCart);
+router.route("/cart/details").get(verifyJWT, getCart);
 
 export default router;
