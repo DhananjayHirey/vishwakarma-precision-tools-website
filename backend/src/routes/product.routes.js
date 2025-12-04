@@ -18,7 +18,7 @@ const router = Router();
 
 router
   .route("/")
-  .get(verifyJWT, getAllProducts)
+  .get(getAllProducts)
   .post(upload.single("productImage"), verifyJWT, adminRoute, createProduct);
 
 router

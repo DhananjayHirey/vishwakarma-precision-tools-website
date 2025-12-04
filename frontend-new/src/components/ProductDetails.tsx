@@ -1,5 +1,5 @@
-import { MagicCard } from "../../../frontend/src/components/ui/magic-card";
-import { Lens } from "../../../frontend/src/components/ui/lens";
+import { MagicCard } from "@/components/ui/magic-card";
+import { Lens } from "@/components/ui/lens";
 
 function ProductDetails({ selectedProduct }: any) {
   return (

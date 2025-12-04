@@ -1,6 +1,6 @@
 import React from "react";
-import { Separator } from "../../../frontend/src/components/ui/separator";
-import { DrawerTrigger } from "../../../frontend/src/components/ui/drawer";
+import { Separator } from "@/components/ui/separator";
+import { DrawerTrigger } from "@/components/ui/drawer";
 
 interface ProductCardProps {
   imageUri: string;

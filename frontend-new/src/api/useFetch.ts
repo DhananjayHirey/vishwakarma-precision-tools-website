@@ -12,6 +12,8 @@ export function useApi<T = any>(apiFunc: (...args: any[]) => Promise<T>) {
         try {
             const res = await apiFunc(...params);
             setData(res);
+            console.log("Data received",res);
+            
             return res; // still returns result if needed
         } catch (err: any) {
             setError(err?.message || "Something went wrong");

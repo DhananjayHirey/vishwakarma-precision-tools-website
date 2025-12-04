@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import React, { useState } from "react";
-import { Input } from "../../../frontend/src/components/ui/input";
-import { RippleButton } from "../../../frontend/src/components/ui/ripple-button";
+import { Input } from "@/components/ui/input";
+import { RippleButton } from "@/components/ui/ripple-button";
 import { toast } from "sonner";
 import { useApi } from "@/api/useFetch";
 import { login } from "@/api/auth.api";

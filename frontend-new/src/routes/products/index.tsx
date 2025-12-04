@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import ProductDetails from "@/components/ProductDetails";
 import { Minus, Plus } from "lucide-react";
 import { RippleButton } from "@/components/ui/ripple-button";
+import { useApi } from '@/api/useFetch';
+import { getAllProducts } from '@/api/product.api';
 
 export const Route = createFileRoute('/products/')({
     component: RouteComponent,
@@ -34,23 +36,13 @@ function RouteComponent() {
     const [selectedProduct, setSelectedProduct] = useState([]);
     const [quantity, setQuantity] = useState(0);
     const [category, setCategory] = useState<any>([]);
+
+    const {call:getProductsCall,data:products,loading:loadingProducts, error: productsLoadError} = useApi(getAllProducts)
     const [cart, setCart] = useState<Item[]>([]);
-    const getProducts = async () => {
-        const url = import.meta.env.VITE_SERVER_URL;
-        const res = await fetch(url + "/api/products", {
-            method: "GET",
-            credentials: "include",
-        })
-            .then((res) => res.json())
-            .catch((e) =>
-                toast.error("Some error occurred while fetching products!" + e)
-            );
-        // setProductsData(res.json()?.data)
-        if (res?.success) {
-            setProductsData(res.data);
-        } else {
-            return toast.error("Some error occurred while fetching products!");
-        }
+    const getProducts =  () => {
+        getProductsCall()
+        console.log(products);
+        
     };
 
     const loadScript = (src: string) => {

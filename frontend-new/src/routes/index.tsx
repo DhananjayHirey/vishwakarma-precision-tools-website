@@ -19,7 +19,7 @@ function App() {
     const [authModalVisible, setAuthModalVisible] = useState(false);
     return (
         <>
-            <ScrollProgress />
+                
             {authModalVisible && (
                 <div className="fixed inset-0 bg-[#00000080]  flex items-center justify-center z-50">
                     <AuthModal

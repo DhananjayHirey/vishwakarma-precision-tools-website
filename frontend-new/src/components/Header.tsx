@@ -1,89 +1,85 @@
-import React from 'react';
-import { Grid2x2PlusIcon, MenuIcon } from 'lucide-react';
-import { Sheet, SheetContent, SheetFooter } from '@/components/ui/sheet';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useNavigate } from '@tanstack/react-router';
+"use client"
+
+import * as React from "react"
+import {
+	Navbar as Nav,
+	NavBody,
+	NavItems,
+	MobileNav,
+	NavbarButton,
+	MobileNavHeader,
+	MobileNavToggle,
+	MobileNavMenu,
+} from "@/components/ui/resizable-navbar";
+import { Download } from "lucide-react";
+import { ScrollProgress } from "./ui/scroll-progress";
+import { Button } from "./ui/button";
+
 
 export function Header() {
-	const [open, setOpen] = React.useState(false);
-	const navigate = useNavigate();
-	const links = [
-		{
-			label: 'Features',
-			href: '#',
-		},
-		{
-			label: 'Pricing',
-			href: '#',
-		},
-		{
-			label: 'About',
-			href: '#',
-		},
-	];
+
+
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
+
+	const navItems = [
+		{ name: "About", link: "/about" },
+		{ name: "Products", link: "/products" },
+		{ name: "Contact", link: "/contact" },
+	]
+
+
 
 	return (
-		<header
-			className={cn(
-				'sticky top-5 z-50 ',
-				'mx-auto w-full max-w-6xl rounded-lg border shadow',
-				'bg-background/95 supports-[backdrop-filter]:bg-background/80 backdrop-blur-lg',
-			)}
-		>
-			<nav className="mx-auto flex items-center justify-between p-4">
-				<div onClick={() => navigate({ to: '/' })} className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 duration-100">
-					<Grid2x2PlusIcon className="size-5" />
-					<p className="font-mono text-base font-bold">Asme</p>
-				</div>
-				<div className="hidden items-center gap-1 lg:flex">
-					{links.map((link) => (
-						<a
-							className={buttonVariants({ variant: 'ghost', size: 'sm' })}
-							href={link.href}
-							key={link.label}
-						>
-							{link.label}
-						</a>
-					))}
-				</div>
-				<div className="flex items-center gap-2">
-					<Button size="sm">Login</Button>
-					<Sheet open={open} onOpenChange={setOpen}>
-						<Button
-							size="icon"
-							variant="outline"
-							onClick={() => setOpen(!open)}
-							className="lg:hidden"
-						>
-							<MenuIcon className="size-4" />
-						</Button>
-						<SheetContent
-							className="bg-background/95 supports-[backdrop-filter]:bg-background/80 gap-0 backdrop-blur-lg"
+		<main className="fixed w-full z-20">
+			<ScrollProgress className=" h-1 z-50" />
+			<Nav className="px-3 py-2">
+				{/* Desktop Navigation */}
+				<NavBody>
+					{/* <NavbarLogo /> */}
+					<span className="font-bold   text-2xl  font-sans"> &lt;VP&gt;</span>
+					<NavItems items={navItems} />
+					<Button variant="outline" className="hidden md:inline-flex">
+						Login
+					</Button>
+				</NavBody>
 
-							side="left"
-						>
-							<div className="grid gap-y-2 overflow-y-auto px-4 pt-12 pb-5">
-								{links.map((link) => (
-									<a
-										className={buttonVariants({
-											variant: 'ghost',
-											className: 'justify-start',
-										})}
-										href={link.href}
-									>
-										{link.label}
-									</a>
-								))}
-							</div>
-							<SheetFooter>
-								<Button variant="outline">Sign In</Button>
-								<Button>Get Started</Button>
-							</SheetFooter>
-						</SheetContent>
-					</Sheet>
-				</div>
-			</nav>
-		</header>
-	);
+				{/* Mobile Navigation */}
+				<MobileNav>
+					<MobileNavHeader>
+						<span className="font-bold text-md font-sans">&lt;/&gt;</span>
+						<MobileNavToggle
+							isOpen={isMobileMenuOpen}
+							onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+						/>
+					</MobileNavHeader>
+
+					<MobileNavMenu
+						isOpen={isMobileMenuOpen}
+						onClose={() => setIsMobileMenuOpen(false)}
+					>
+						{navItems.map((item, idx) => (
+							<a
+								key={`mobile-link-${idx}`}
+								href={item.link}
+								onClick={() => setIsMobileMenuOpen(false)}
+								className="relative text-neutral-600 dark:text-neutral-300"
+							>
+								<span className="block">{item.name}</span>
+							</a>
+						))}
+						<div className="flex w-full justify-center flex-col gap-4">
+							<NavbarButton
+								onClick={() => setIsMobileMenuOpen(false)}
+								variant="secondary"
+
+							>
+								Login
+							</NavbarButton>
+						</div>
+					</MobileNavMenu>
+				</MobileNav>
+			</Nav>
+		</main>
+	)
 }
