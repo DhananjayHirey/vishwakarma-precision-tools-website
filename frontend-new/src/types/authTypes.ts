@@ -35,6 +35,7 @@ export interface AuthStateUser {
     avatar: string
     addressses?: string[]
     cartItems?: string[]
+    role?: string
     createdAt: string
     updatedAt: string
 }

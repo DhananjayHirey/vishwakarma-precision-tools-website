@@ -35,7 +35,7 @@ export function Header() {
 
 
 	return (
-		<main className="fixed w-full z-20">
+		<main className="fixed w-full z-20 top-0">
 			<ScrollProgress className=" h-1" />
 			<Nav className="px-3 py-2 z-20">
 				{/* Desktop Navigation */}
