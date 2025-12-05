@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import { useState } from "react"
 import {
 	Navbar as Nav,
 	NavBody,
@@ -11,16 +11,20 @@ import {
 	MobileNavToggle,
 	MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { Download } from "lucide-react";
 import { ScrollProgress } from "./ui/scroll-progress";
-import { Button } from "./ui/button";
+import LoginDialog from "./auth/LoginDialog";
+import { useAppSelector } from "@/redux/hooks";
+import LogoutDialog from "./auth/LogoutDialog";
+import { SignUpDialog } from "./auth/SignUpDialog";
 
 
 export function Header() {
+	const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated)
+	console.log("Authenticated:", isAuthenticated);
 
 
-	const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [activeDialog, setActiveDialog] = useState<string | null>(null)
 
 	const navItems = [
 		{ name: "About", link: "/about" },
@@ -32,16 +36,33 @@ export function Header() {
 
 	return (
 		<main className="fixed w-full z-20">
-			<ScrollProgress className=" h-1 z-50" />
-			<Nav className="px-3 py-2">
+			<ScrollProgress className=" h-1" />
+			<Nav className="px-3 py-2 z-20">
 				{/* Desktop Navigation */}
 				<NavBody>
 					{/* <NavbarLogo /> */}
 					<span className="font-bold   text-2xl  font-sans"> &lt;VP&gt;</span>
 					<NavItems items={navItems} />
-					<Button variant="outline" className="hidden md:inline-flex">
-						Login
-					</Button>
+					{!isAuthenticated ? (
+						<div className="flex gap-4">
+
+							<NavbarButton variant="gradient" className="px-5" onClick={() => setActiveDialog("login")}>
+								Login
+							</NavbarButton>
+							<NavbarButton variant="gradient" className="px-5" onClick={() => setActiveDialog("signup")}>
+								Signup
+							</NavbarButton>
+						</div>
+					) : (
+						<div className="flex gap-4">
+							<NavbarButton variant="gradient" className="px-5">
+								Dashboard
+							</NavbarButton>
+							<NavbarButton variant="gradient" className="px-5" onClick={() => setActiveDialog("logout")}>
+								Logout
+							</NavbarButton>
+						</div>
+					)}
 				</NavBody>
 
 				{/* Mobile Navigation */}
@@ -79,6 +100,20 @@ export function Header() {
 						</div>
 					</MobileNavMenu>
 				</MobileNav>
+				<LoginDialog
+					open={activeDialog === "login"}
+					onClose={() => setActiveDialog(null)}
+					onSwitchToSignup={() => setActiveDialog("signup")}
+				/>
+				<LogoutDialog
+					open={activeDialog === "logout"}
+					onClose={() => setActiveDialog(null)}
+				/>
+				<SignUpDialog
+					open={activeDialog === "signup"}
+					onClose={() => setActiveDialog(null)}
+					onSwitchToLogin={() => setActiveDialog("login")}
+				/>
 			</Nav>
 		</main>
 	)

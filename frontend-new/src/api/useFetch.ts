@@ -16,7 +16,9 @@ export function useApi<T = any>(apiFunc: (...args: any[]) => Promise<T>) {
             
             return res; // still returns result if needed
         } catch (err: any) {
-            setError(err?.message || "Something went wrong");
+            console.log("API call error: ",err);
+            
+            setError(err || "Something went wrong");
             throw err;
         } finally {
             setLoading(false);

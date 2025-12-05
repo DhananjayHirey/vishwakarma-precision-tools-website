@@ -6,7 +6,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 const RootLayout = () => (
     <>
         <Header />
-        <Toaster richColors position='top-right' closeButton />
+        <Toaster richColors position='top-right' closeButton expand/>
         
         <Outlet />
         <TanStackRouterDevtools />

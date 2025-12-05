@@ -8,7 +8,7 @@
             form.append("username", data.username)
             form.append("email", data.email)
             form.append("password", data.password)
-            form.append("address", data.address ? JSON.stringify(data.address) : "")
+            // form.append("address", data.address ? JSON.stringify(data.address) : "")
             form.append("isPrimary", "true")
             if (data.avatar) form.append("avatar", data.avatar)
             const res = await apiClient.post<ApiSuccessResponse>('/users/register', form, {

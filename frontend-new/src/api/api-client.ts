@@ -27,7 +27,7 @@ interface RefreshTokenResponse {
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
+const authFreeRoutes = ['/login', '/register', '/forgot-password'];
 class ApiClient {
     private axiosInstance: AxiosInstance;
     private isRefreshing = false;
@@ -52,7 +52,7 @@ class ApiClient {
                 const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
 
-                if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/users/refresh-token')) {
+                if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/users/refresh-token') && !authFreeRoutes.some(route => originalRequest.url?.includes(route))) {
                     if (this.isRefreshing) {
                         // If already refreshing, queue the request
                         return new Promise((resolve, reject) => {

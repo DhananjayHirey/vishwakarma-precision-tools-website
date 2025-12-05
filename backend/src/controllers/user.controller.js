@@ -45,9 +45,9 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   // console.log(req);
-  const { name, username, email, password, address } = req.body;
-  const addressObj = JSON.parse(address);
-  if (!name || !username || !email || !password || !addressObj) {
+  const { name, username, email, password } = req.body;
+  // const addressObj = JSON.parse(address);
+  if (!name || !username || !email || !password ) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -84,8 +84,6 @@ const registerUser = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
     email,
     password,
-    cartItems: [],
-    addresses: [addressObj],
     role: "customer",
   });
 
