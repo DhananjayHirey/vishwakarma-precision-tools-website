@@ -53,15 +53,15 @@ const LoginDialog = ({ open, onClose, onSwitchToSignup }: LoginDialogProps) => {
             ? { email: identifier, password }
             : { username: identifier, password }
         try {
-            await loginUser(loginData);
-
+            const res = await loginUser(loginData);
+            console.log(res);
+            
             toast.success("Login successful!");
-            dispatch(loginSuccess({ ...data.user }))
+            dispatch(loginSuccess(res.user))
             console.log("Login Response:", data.user);
             onClose();
         } catch {
             console.log(error);
-
             toast.error(error);
         }
 
@@ -70,10 +70,6 @@ const LoginDialog = ({ open, onClose, onSwitchToSignup }: LoginDialogProps) => {
 
     useEffect(() => {
         if (!open) return;
-        if (error) {
-            toast.error(error);
-            return
-        }
         return () => {
             setIdentifier("");
             setPassword("");

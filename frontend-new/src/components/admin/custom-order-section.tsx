@@ -1,4 +1,3 @@
-"use client"
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ChevronRight } from "lucide-react"
 
 interface CustomOrder {
     id: string
@@ -18,6 +18,7 @@ interface CustomOrder {
 interface CustomOrdersSectionProps {
     customOrders: CustomOrder[]
     onUpdateStatus: (orderId: string, status: string) => void
+    showQuickView?: boolean
 }
 
 const customOrderStatusConfig: Record<string, { bg: string; text: string; label: string }> = {
@@ -34,7 +35,7 @@ const customOrderStatusConfig: Record<string, { bg: string; text: string; label:
     rejected: { bg: "bg-red-500/10", text: "text-red-700 dark:text-red-500", label: "Rejected" },
 }
 
-export default function CustomOrdersSection({ customOrders, onUpdateStatus }: CustomOrdersSectionProps) {
+export default function CustomOrdersSection({ customOrders, onUpdateStatus, showQuickView }: CustomOrdersSectionProps) {
     const [selectedCustomOrder, setSelectedCustomOrder] = useState<CustomOrder | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [customOrderStatus, setCustomOrderStatus] = useState("")
@@ -52,23 +53,55 @@ export default function CustomOrdersSection({ customOrders, onUpdateStatus }: Cu
         }
     }
 
+    const displayOrders = showQuickView ? customOrders.slice(0, 3) : customOrders
+
     return (
         <>
-            <Card className="border-border/50">
-                <CardHeader>
-                    <CardTitle className="text-lg">Custom Order Requests</CardTitle>
+            <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg font-bold text-foreground">Custom Orders</CardTitle>
+                        {showQuickView && <span className="text-xs text-muted-foreground">{customOrders.length} total</span>}
+                    </div>
                 </CardHeader>
                 <CardContent>
-                    {customOrders.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">No custom orders yet</p>
-                    ) : (
+                    {displayOrders.length === 0 ? (
+                        <p className="text-muted-foreground text-center py-8">No custom orders</p>
+                    ) : showQuickView ? (
                         <div className="space-y-3">
-                            {customOrders.map((order) => {
+                            {displayOrders.map((order) => {
                                 const statusConfig = customOrderStatusConfig[order.status] || customOrderStatusConfig.pending
                                 return (
                                     <div
                                         key={order.id}
-                                        className="flex items-center justify-between p-4 border border-border/50 rounded-lg hover:bg-muted/30"
+                                        className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                                    >
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <p className="font-semibold text-sm text-foreground">{order.id}</p>
+                                                <span
+                                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}
+                                                >
+                                                    {statusConfig.label}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-muted-foreground truncate">{order.customer}</p>
+                                        </div>
+                                        <Button variant="ghost" size="sm" onClick={() => handleEditClick(order)} className="h-8 w-8 p-0">
+                                            <ChevronRight className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {displayOrders.map((order) => {
+                                const statusConfig = customOrderStatusConfig[order.status] || customOrderStatusConfig.pending
+                                return (
+                                    <div
+                                        key={order.id}
+                                        className="flex items-center justify-between p-4 border border-border/50 rounded-lg hover:bg-muted/30 transition-colors"
                                     >
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-1">

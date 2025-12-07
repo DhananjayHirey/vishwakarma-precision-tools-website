@@ -1,4 +1,4 @@
-"use client"
+
 
 const paymentStatusConfig: Record<string, { bg: string; text: string; label: string }> = {
     pending: { bg: "bg-yellow-500/10", text: "text-yellow-700 dark:text-yellow-500", label: "Pending" },

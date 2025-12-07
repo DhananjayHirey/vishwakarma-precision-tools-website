@@ -7,10 +7,13 @@ import {
   updateOrderStatus,
 } from "../controllers/order.controller.js";
 
+
 const router = Router();
 
-router.get("/getAllOrders", verifyJWT, adminRoute, getAllOrders);
 router.post("/placeOrder", placeOrder);
-router.patch("/updateOrderStatus", verifyJWT, adminRoute, updateOrderStatus);
+router.use(verifyJWT,adminRoute)
+router.get("/getAllOrders", getAllOrders);
+router.patch("/updateOrderStatus", updateOrderStatus);
+
 
 export default router;

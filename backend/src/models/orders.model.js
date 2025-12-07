@@ -19,7 +19,11 @@ const orderSchema = mongoose.Schema({
   eta: Date || null,
   paymentStatus: Boolean,
   totalBilling: Number,
-  orderStatus: String,
+  orderStatus: {
+    type: String,
+    enum: ["pending", "manufacturing", "out for delivery", "delivered", "rejected"],
+    default: "pending",
+  }
   // order Status can be Pending to be accepted, Manufacturing, Out for Delivery, Delivered,rejected
 });
 
