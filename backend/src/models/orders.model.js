@@ -14,6 +14,9 @@ const orderSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  shippingAddress: String,
+  TIN: String,
+  email: String,
   orderDate: Date,
   expectedDateByClient: Date,
   eta: Date || null,
@@ -21,9 +24,15 @@ const orderSchema = mongoose.Schema({
   totalBilling: Number,
   orderStatus: {
     type: String,
-    enum: ["pending", "manufacturing", "out for delivery", "delivered", "rejected"],
+    enum: [
+      "pending",
+      "manufacturing",
+      "out for delivery",
+      "delivered",
+      "rejected",
+    ],
     default: "pending",
-  }
+  },
   // order Status can be Pending to be accepted, Manufacturing, Out for Delivery, Delivered,rejected
 });
 

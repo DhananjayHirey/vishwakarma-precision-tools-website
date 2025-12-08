@@ -10,9 +10,9 @@ import cloudinary, {
 } from "../utils/cloudinary.js";
 import { User } from "../models/user.model.js";
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, description, price, stock, category } = req.body;
+  const { name, description, price, stock, category, etp } = req.body;
 
-  if (!name || !description || !price || !stock || !category) {
+  if (!name || !description || !price || !stock || !category || !etp) {
     throw new ApiError(400, "Please fill all the fields");
   }
   console.log(req.files);
@@ -43,6 +43,7 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     category,
     stock,
+    etp: Number(etp),
     image: productImageResult.public_id,
   });
 
@@ -248,9 +249,11 @@ const getCart = asyncHandler(async (req, res) => {
 
     const products = [];
     let totalAmount = 0;
+    let totalDays = 0;
     for (let i = 0; i < user.cartItems.length; i += 1) {
       const p = await Product.findById(user.cartItems[i].product);
       totalAmount += user.cartItems[i].quantity * p.price;
+      totalDays += p.etp;
       const signedImageUrl = await getSignedUrlFromCloudinary(
         p.image,
         "image",
@@ -269,7 +272,11 @@ const getCart = asyncHandler(async (req, res) => {
       .json(
         new ApiResponse(
           200,
-          { totalAmount: totalAmount, products: products },
+          {
+            totalAmount: totalAmount,
+            products: products,
+            eta: Date.now() + totalDays + 2,
+          },
           "Cart Items fetched successfully"
         )
       );
