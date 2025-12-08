@@ -1,5 +1,5 @@
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -12,7 +12,7 @@ interface Order {
     total: number
     items: number
     paymentStatus: string
-    deliveryStatus: string
+    orderStatus: string
 }
 
 interface EditOrderDialogProps {
@@ -20,15 +20,21 @@ interface EditOrderDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onSave: (paymentStatus: string, deliveryStatus: string) => void
+    loading?: boolean
 }
 
-export function EditOrderDialog({ order, open, onOpenChange, onSave }: EditOrderDialogProps) {
+export function EditOrderDialog({ order, open, onOpenChange, onSave, loading }: EditOrderDialogProps) {
     const [paymentStatus, setPaymentStatus] = useState(order.paymentStatus)
-    const [deliveryStatus, setDeliveryStatus] = useState(order.deliveryStatus)
+    const [orderStatus, setOrderStatus] = useState(order.orderStatus)
 
     const handleSave = () => {
-        onSave(paymentStatus, deliveryStatus)
+        onSave(paymentStatus, orderStatus)
     }
+
+    useEffect(() => {
+        setPaymentStatus(order.paymentStatus)
+        setOrderStatus(order.orderStatus)
+    }, [order])
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,23 +62,25 @@ export function EditOrderDialog({ order, open, onOpenChange, onSave }: EditOrder
                             <SelectContent>
                                 <SelectItem value="pending">Pending</SelectItem>
                                 <SelectItem value="completed">Completed</SelectItem>
-                                <SelectItem value="failed">Failed</SelectItem>
+                                {/* <SelectItem value="failed">Failed</SelectItem> */}
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div className="space-y-3">
-                        <Label htmlFor="delivery-status">Delivery Status</Label>
-                        <Select value={deliveryStatus} onValueChange={setDeliveryStatus}>
-                            <SelectTrigger id="delivery-status">
+                        <Label htmlFor="order-status">Order Status</Label>
+                        <Select value={orderStatus} onValueChange={setOrderStatus}>
+                            <SelectTrigger id="order-status">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="processing">Processing</SelectItem>
-                                <SelectItem value="shipped">Shipped</SelectItem>
+                                <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                                <SelectItem value="out for delivery">Out for Delivery</SelectItem>
                                 <SelectItem value="delivered">Delivered</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
                             </SelectContent>
+
                         </Select>
                     </div>
                 </div>
@@ -81,7 +89,7 @@ export function EditOrderDialog({ order, open, onOpenChange, onSave }: EditOrder
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>
-                    <Button onClick={handleSave}>Save Changes</Button>
+                    <Button onClick={handleSave} disabled={loading}>{loading ? "Saving..." : "Save Changes"}</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

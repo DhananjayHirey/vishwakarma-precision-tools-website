@@ -23,7 +23,7 @@ router
 
 router
   .route("/:id")
-  .patch(verifyJWT, adminRoute, updateProductDetails)
+  .patch(verifyJWT, adminRoute, upload.single("productImage"), updateProductDetails)
   .delete(verifyJWT, adminRoute, deleteProduct)
   .get(verifyJWT, getProductById);
 router.route("/:id/stock").patch(verifyJWT, adminRoute, updateStock);

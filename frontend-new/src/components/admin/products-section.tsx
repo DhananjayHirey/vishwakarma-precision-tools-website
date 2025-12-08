@@ -1,7 +1,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Edit2, Trash2, ImageIcon, Upload } from "lucide-react"
+import { useApi } from "@/api/useFetch"
+import { getAllProducts } from "@/api/product.api"
 
 interface Product {
     id: string
@@ -19,35 +21,51 @@ interface Product {
     stock: number
     category: string
     sold: number
+    signedImageUrl?: string
 }
 
 interface ProductsSectionProps {
-    products: Product[]
-    onAddProduct: (product: Omit<Product, "id">) => void
-    onUpdateProduct: (id: string, data: Partial<Product>) => void
-    onDeleteProduct: (id: string) => void
     showQuickView?: boolean
 }
 
 export default function ProductsSection({
-    products,
-    onAddProduct,
-    onUpdateProduct,
-    onDeleteProduct,
     showQuickView,
 }: ProductsSectionProps) {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+    const [products, setProducts] = useState<Product[]>([])
     const [imagePreview, setImagePreview] = useState<string>("")
+    const [imageFile, setImageFile] = useState<File | null>(null)
+
     const [formData, setFormData] = useState({
         name: "",
         description: "",
         price: 0,
         stock: 0,
         category: "",
-        image: "",
+        image: undefined as File | undefined,
     })
+
+    const { call: getProds, loading } = useApi(getAllProducts)
+    // const { call: addProd, loading: adding } = useApi(addProduct)
+    // const { call: editProd, loading: editing } = useApi(editProduct)
+    // const { call: deleteProd, loading: deleting } = useApi(deleteProduct)
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await getProds()
+                console.log("products", response);
+
+                setProducts(response)
+            } catch (err) {
+                console.error("Failed to fetch products:", err)
+            }
+        }
+
+        fetchProducts()
+    }, [getProds])
 
     const handleAddClick = () => {
         setFormData({ name: "", description: "", price: 0, stock: 0, category: "", image: "" })
@@ -63,9 +81,10 @@ export default function ProductsSection({
             price: product.price,
             stock: product.stock,
             category: product.category,
-            image: product.image,
+            image: undefined,
         })
-        setImagePreview(product.image)
+        setImagePreview(product.signedImageUrl || "")
+        setImageFile(null)
         setIsEditDialogOpen(true)
     }
 
@@ -76,7 +95,8 @@ export default function ProductsSection({
             reader.onloadend = () => {
                 const result = reader.result as string
                 setImagePreview(result)
-                setFormData({ ...formData, image: result })
+                setImageFile(file)
+                setFormData({ ...formData, image: file })
             }
             reader.readAsDataURL(file)
         }
@@ -84,10 +104,10 @@ export default function ProductsSection({
 
     const handleSaveProduct = () => {
         if (selectedProduct) {
-            onUpdateProduct(selectedProduct.id, formData)
+            // onUpdateProduct(selectedProduct.id, formData)
             setIsEditDialogOpen(false)
         } else {
-            onAddProduct({ ...formData, sold: 0 })
+            // onAddProduct({ ...formData, sold: 0 })
             setIsAddDialogOpen(false)
         }
     }
@@ -115,9 +135,9 @@ export default function ProductsSection({
                                     className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                                 >
                                     <div className="w-12 h-12 rounded-lg bg-muted/50 flex items-center justify-center flex-shrink-0">
-                                        {product.image ? (
+                                        {product.signedImageUrl ? (
                                             <img
-                                                src={product.image || "/placeholder.svg"}
+                                                src={product.signedImageUrl || "/placeholder.svg"}
                                                 alt={product.name}
                                                 className="w-full h-full object-cover rounded-lg"
                                             />
@@ -128,7 +148,7 @@ export default function ProductsSection({
                                     <div className="flex-1 min-w-0">
                                         <p className="font-semibold text-sm text-foreground truncate">{product.name}</p>
                                         <p className="text-xs text-muted-foreground">
-                                            ${product.price} • Stock: {product.stock}
+                                            Rs. {product.price} • Stock: {product.stock}
                                         </p>
                                     </div>
                                     <Button variant="ghost" size="sm" onClick={() => handleEditClick(product)} className="h-8 w-8 p-0">
@@ -156,9 +176,9 @@ export default function ProductsSection({
                                             <td className="py-3 px-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center flex-shrink-0">
-                                                        {product.image ? (
+                                                        {product.signedImageUrl ? (
                                                             <img
-                                                                src={product.image || "/placeholder.svg"}
+                                                                src={product.signedImageUrl || "/placeholder.svg"}
                                                                 alt={product.name}
                                                                 className="w-full h-full object-cover rounded-lg"
                                                             />
@@ -173,14 +193,14 @@ export default function ProductsSection({
                                                 </div>
                                             </td>
                                             <td className="py-3 px-4 text-foreground">{product.category}</td>
-                                            <td className="py-3 px-4 font-semibold text-foreground">${product.price}</td>
+                                            <td className="py-3 px-4 font-semibold text-foreground">Rs.  {product.price}</td>
                                             <td className="py-3 px-4">
                                                 <span
-                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${product.stock > 20
-                                                            ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                                                            : product.stock > 0
-                                                                ? "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
-                                                                : "bg-red-500/10 text-red-600 dark:text-red-400"
+                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-lg font-semibold italic Rs. {product.stock > 20
+                                                        ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                                                        : product.stock > 0
+                                                            ? "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
+                                                            : "bg-red-500/10 text-red-600 dark:text-red-400"
                                                         }`}
                                                 >
                                                     {product.stock}
@@ -252,7 +272,7 @@ export default function ProductsSection({
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="price">Price ($)</Label>
+                                <Label htmlFor="price">Price (Rs. )</Label>
                                 <Input
                                     id="price"
                                     type="number"

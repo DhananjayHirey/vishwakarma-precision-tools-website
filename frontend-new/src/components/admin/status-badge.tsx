@@ -10,33 +10,35 @@ const paymentStatusConfig: Record<string, { bg: string; text: string; label: str
     failed: { bg: "bg-red-500/10", text: "text-red-700 dark:text-red-500", label: "Failed" },
 }
 
-const deliveryStatusConfig: Record<string, { bg: string; text: string; label: string }> = {
-    pending: { bg: "bg-slate-500/10", text: "text-slate-700 dark:text-slate-500", label: "Pending" },
-    processing: {
-        bg: "bg-blue-500/10",
-        text: "text-blue-700 dark:text-blue-500",
-        label: "Processing",
-    },
-    shipped: { bg: "bg-purple-500/10", text: "text-purple-700 dark:text-purple-500", label: "Shipped" },
+const orderStatusConfig: Record<string, { bg: string; text: string; label: string }> = {
+    pending: { bg: "bg-amber-500/10", text: "text-amber-700 dark:text-amber-500", label: "Pending" },
+    "out for delivery": { bg: "bg-purple-500/10", text: "text-purple-700 dark:text-purple-500", label: "Out for Delivery" },
     delivered: {
         bg: "bg-green-500/10",
         text: "text-green-700 dark:text-green-500",
         label: "Delivered",
     },
+    manufacturing: {
+        bg: "bg-cyan-500/10",
+        text: "text-cyan-700 dark:text-cyan-500",
+        label: "Manufacturing",
+    },
+    rejected: { bg: "bg-red-500/10", text: "text-red-700 dark:text-red-500", label: "Rejected" },
 }
 
 interface StatusBadgeProps {
     status: string
-    type: "payment" | "delivery"
+    type: "payment" | "orderStatus"
 }
 
 export function StatusBadge({ status, type }: StatusBadgeProps) {
-    const config = type === "payment" ? paymentStatusConfig : deliveryStatusConfig
+    const config = type === "payment" ? paymentStatusConfig : orderStatusConfig
     const statusConfig = config[status] || config.pending
-
+    // console.log("status connfig",statusConfig);
+    
     return (
         <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-md font-semibold italic ${statusConfig.bg} ${statusConfig.text}`}
         >
             {statusConfig.label}
         </span>

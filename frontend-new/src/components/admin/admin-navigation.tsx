@@ -11,8 +11,8 @@ export default function AdminNavigation({ activeSection, onSectionChange }: Admi
     const sections = [
         { id: "overview", label: "Overview", icon: Zap },
         { id: "orders", label: "Orders", icon: ShoppingCart },
-        { id: "custom", label: "Custom Orders", icon: Package },
         { id: "products", label: "Products", icon: Package },
+        { id: "custom", label: "Custom Orders", icon: Package },
     ]
 
     return (

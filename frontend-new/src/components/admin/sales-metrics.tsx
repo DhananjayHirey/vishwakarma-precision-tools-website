@@ -41,11 +41,12 @@ export default function SalesMetrics() {
         fetchMetrics()
     }, [getMetrics])
 
-    if (loading) return <p className="text-center text-muted-foreground py-4">📦 Loading metrics...</p>
+    if (loading) return <p className="text-center text-2xl italic font-semibold text-muted-foreground py-4">📦 Loading metrics...</p>
     if (error) return <p className="text-red-500 text-center py-4">❌ Failed to load metrics</p>
     if (!metrics) return null
 
     const displayData = [
+        
         { key: "totalSales", label: "Total Sales", value: `₹${metrics.totalSales}` },
         { key: "totalOrders", label: "Total Orders", value: metrics.totalOrders },
         { key: "shippedItems", label: "Items Shipped", value: metrics.shippedItems },
@@ -102,7 +103,7 @@ export default function SalesMetrics() {
                                 {/* Left: Image + Details */}
                                 <div className="flex items-center gap-4">
                                     <img
-                                        src={product.image}
+                                        src={product.signedImageUrl}
                                         alt={product.name}
                                         className="w-14 h-14 rounded-lg object-cover"
                                     />

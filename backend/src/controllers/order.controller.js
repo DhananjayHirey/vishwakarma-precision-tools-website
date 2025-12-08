@@ -62,4 +62,17 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, order, "Order Status updated successfully"));
 });
 
-export { getAllOrders, placeOrder, updateOrderStatus };
+const updatePaymentStatus = asyncHandler(async (req, res) => {
+  const { orderId, paymentStatus } = req.body;
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(400, "Could not find order");
+  }
+  order.paymentStatus = paymentStatus;
+  await order.save();
+  res
+    .status(200)
+    .json(new ApiResponse(200, order, "Payment Status updated successfully"));
+});
+
+export { getAllOrders, placeOrder, updateOrderStatus,updatePaymentStatus };

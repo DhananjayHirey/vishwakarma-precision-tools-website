@@ -5,7 +5,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import path from "path";
 import cloudinary, {
+  deleteFileFromCloudinary,
   getSignedUrlFromCloudinary,
+  getUrlFromCloudinaryPublicId,
   uploadToCloudinary,
 } from "../utils/cloudinary.js";
 import { User } from "../models/user.model.js";
@@ -123,7 +125,7 @@ const updateStock = asyncHandler(async (productId, quantity) => {
 
 const updateProductDetails = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { name, description, price, image, stock } = req.body;
+  const { name, description, price, stock } = req.body;
 
   const product = await Product.findById(id);
   if (!product) {
@@ -133,12 +135,34 @@ const updateProductDetails = asyncHandler(async (req, res) => {
   product.name = name || product.name;
   product.description = description || product.description;
   product.price = price || product.price;
-  if (image) {
-    const oldImage = product.image;
-    product.image = image;
-    // delete old image logic
-  }
   product.stock = stock !== undefined ? stock : product.stock;
+
+  const productImageLocalPath = req.file?.path;
+
+  if (productImageLocalPath) {
+    const now = Date.now();
+    const productImageFolder = `${APP_NAME}/products/${product.name}-${now}`;
+    const productImageFileName = path.basename(productImageLocalPath);
+    
+    const oldImagePublicId = product.image;
+    if (oldImagePublicId) {
+      const url = await getUrlFromCloudinaryPublicId(oldImagePublicId, "image");
+      console.log(`Deleting old image from Cloudinary: ${url}`);
+      await deleteFileFromCloudinary(oldImagePublicId, "image");
+    }
+
+    const productImageResult = await uploadToCloudinary(
+      productImageLocalPath,
+      productImageFolder,
+      productImageFileName,
+      "image",
+      "authenticated"
+    );
+    if (!productImageResult || !productImageResult.public_id) {
+      throw new ApiError(400, "Failed to upload product image");
+    }
+    product.image = productImageResult.public_id;
+  }
   await product.save();
 
   res
@@ -148,24 +172,18 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 
 const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const product = await Product.findByIdAndDelete(id);
+  const product = await Product.findById(id);
   if (!product) {
     throw new ApiError(404, "Product not found");
   }
-  try {
-    console.log(`Deleting from Cloudinary: public_id=${product.image}`);
-    if (!product.image) {
-      console.error("No public_id provided for deletion");
-    } else {
-      const result = await cloudinary.uploader.destroy(product.image, {
-        resource_type: "image",
-      });
-      console.log("✅ Deleted from Cloudinary:", result);
-    }
-  } catch (error) {
-    console.error(`❌ Cloudinary deletion error:`, error);
+  
+  const imagePublicId = product.image;
+  if (imagePublicId) {
+    const url = await getUrlFromCloudinaryPublicId(imagePublicId, "image");
+    console.log(`Deleting product image from Cloudinary: ${url}`);
+    await deleteFileFromCloudinary(imagePublicId, "image");
   }
-
+  await Product.findByIdAndDelete(id);
   res
     .status(200)
     .json(new ApiResponse(200, null, "Product deleted successfully"));

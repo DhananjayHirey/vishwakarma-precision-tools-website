@@ -2,6 +2,7 @@ import { Order } from '../models/orders.model.js'
 import { ApiError } from '../utils/ApiError.js'
 import { ApiResponse } from '../utils/ApiResponse.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
+import { getSignedUrlFromCloudinary } from '../utils/cloudinary.js';
 
 export const getSalesMetrics = asyncHandler(async (req, res, next) => {
 
@@ -41,7 +42,7 @@ export const getSalesMetrics = asyncHandler(async (req, res, next) => {
         },
         {
             $lookup: {
-                from: "products", 
+                from: "products",
                 localField: "_id",
                 foreignField: "_id",
                 as: "product"
@@ -51,12 +52,12 @@ export const getSalesMetrics = asyncHandler(async (req, res, next) => {
 
         {
             $project: {
-                _id: 0,  
+                _id: 0,
                 productId: "$product._id",
                 name: "$product.name",
                 price: "$product.price",
                 image: "$product.image",
-                sold: 1  
+                sold: 1
             }
         },
 
@@ -64,6 +65,16 @@ export const getSalesMetrics = asyncHandler(async (req, res, next) => {
         { $limit: 5 }
     ]);
 
+    const topSellingProductsWithUrls =  await Promise.all(
+        topProducts.map(async (product) => {
+            const signedImageUrl = await getSignedUrlFromCloudinary(product.image, "image", "authenticated");
+
+            return {
+                ...product,
+                signedImageUrl,
+            };
+        })
+    );
 
     // ---------------- PENDING ORDERS ----------------
     const pendingOrders = await Order.countDocuments({ orderStatus: "pending" });
@@ -76,7 +87,7 @@ export const getSalesMetrics = asyncHandler(async (req, res, next) => {
                     totalSales,
                     totalOrders,
                     shippedItems,
-                    topProducts,
+                    topProducts: topSellingProductsWithUrls,
                     pendingOrders
                 }
             },

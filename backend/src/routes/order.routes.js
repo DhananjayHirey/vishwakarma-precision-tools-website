@@ -5,6 +5,7 @@ import {
   placeOrder,
   getAllOrders,
   updateOrderStatus,
+  updatePaymentStatus,
 } from "../controllers/order.controller.js";
 
 
@@ -14,6 +15,6 @@ router.post("/placeOrder", placeOrder);
 router.use(verifyJWT,adminRoute)
 router.get("/getAllOrders", getAllOrders);
 router.patch("/updateOrderStatus", updateOrderStatus);
-
+router.patch('/updatePaymentStatus',updatePaymentStatus)
 
 export default router;
