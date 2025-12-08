@@ -1,4 +1,4 @@
-import { getCart } from "@/api/cart.api";
+import { getCart, removeFromCart } from "@/api/cart.api";
 import { useApi } from "@/api/useFetch";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -29,6 +29,38 @@ function RouteComponent() {
     error: cartError,
     loading: cartLoading,
   } = useApi(getCart);
+
+  const {
+    call: removeFromCartCall,
+    data: removeFromCartData,
+    error: removeFromCartError,
+    loading: removeFromCartLoading,
+  } = useApi(removeFromCart);
+
+  useEffect(() => {
+    if (removeFromCartLoading) {
+      toast.loading("Item being removed from cart...", {
+        id: "remove-from-cart",
+      });
+    }
+  }, [removeFromCartLoading]);
+
+  useEffect(() => {
+    if (removeFromCartError) {
+      toast.error("Error removing from cart...", {
+        id: "remove-from-cart",
+      });
+    }
+  }, [removeFromCartError]);
+
+  useEffect(() => {
+    if (removeFromCartData) {
+      toast.success("Item removed successfully!", {
+        id: "remove-from-cart",
+      });
+      getCartCall();
+    }
+  }, [removeFromCartData]);
 
   useEffect(() => {
     getCartCall();
@@ -105,29 +137,6 @@ function RouteComponent() {
                       <span className="text-xs text-zinc-400 mt-0.5">
                         ₹{c.product.price} / pc
                       </span>
-
-                      {/* Quantity controls */}
-                      {/* <div className="mt-2 flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7 border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-                          onClick={() => updateQuantity(item.id, -1)}
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-8 text-center text-sm">
-                          {item.quantity}
-                        </span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7 border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-                          onClick={() => updateQuantity(item.id, 1)}
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </div>*/}
                     </div>
 
                     {/* Price + remove */}
@@ -139,7 +148,8 @@ function RouteComponent() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-zinc-500 hover:text-red-400 hover:bg-red-950/40"
-                        // onClick={() => removeItem(item.id)}
+                        onClick={() => removeFromCartCall(c._id)}
+                        disabled={removeFromCartLoading}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

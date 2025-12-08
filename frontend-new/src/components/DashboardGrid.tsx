@@ -10,7 +10,7 @@ const features = [
     name: "Visit the Store",
     description:
       "Explore our collection and find everything you need in one place.",
-    href: "/store",
+    href: "/products",
     cta: "Learn more",
     background: (
       <img

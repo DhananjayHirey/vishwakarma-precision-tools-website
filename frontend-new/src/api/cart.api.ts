@@ -21,3 +21,14 @@ export const addToCart = async(product:string,quantity:number)=>{
         throw error.message;
     }
 }
+
+export const removeFromCart = async(cartItemId:string)=>{
+    try{
+        const res = await apiClient.post<ApiSuccessResponse>('/products/removeFromCart',{cartItemId:cartItemId});
+        return res.success;
+    }catch(error:any){
+        console.error("Error removing to Cart: ",error);
+        throw error.message;
+    }
+
+}

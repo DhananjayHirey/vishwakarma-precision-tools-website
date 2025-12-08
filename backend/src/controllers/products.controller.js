@@ -233,6 +233,7 @@ const getCart = asyncHandler(async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId);
+    console.log(user);
     if (!user) {
       return res
         .status(404)
@@ -244,10 +245,33 @@ const getCart = asyncHandler(async (req, res) => {
           )
         );
     }
+
+    const products = [];
+    let totalAmount = 0;
+    for (let i = 0; i < user.cartItems.length; i += 1) {
+      const p = await Product.findById(user.cartItems[i].product);
+      totalAmount += user.cartItems[i].quantity * p.price;
+      const signedImageUrl = await getSignedUrlFromCloudinary(
+        p.image,
+        "image",
+        "authenticated"
+      );
+      products.push({
+        product: p,
+        quantity: user.cartItems[i].quantity,
+        _id: user.cartItems[i]._id,
+        signedImageUrl: signedImageUrl,
+      });
+    }
+
     return res
       .status(200)
       .json(
-        new ApiResponse(200, user.cartItems, "Cart Items fetched successfully")
+        new ApiResponse(
+          200,
+          { totalAmount: totalAmount, products: products },
+          "Cart Items fetched successfully"
+        )
       );
   } catch (e) {
     return res

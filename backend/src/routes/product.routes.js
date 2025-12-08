@@ -30,6 +30,5 @@ router.route("/:id/stock").patch(verifyJWT, adminRoute, updateStock);
 
 router.route("/addToCart").post(verifyJWT, addToCart);
 router.route("/removeFromCart").post(verifyJWT, removeFromCart);
-router.route("/cart/details").get(verifyJWT, getCart);
 
 export default router;

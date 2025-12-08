@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -20,6 +20,7 @@ import { Minus, Plus } from "lucide-react";
 import { RippleButton } from "@/components/ui/ripple-button";
 import { useApi } from "@/api/useFetch";
 import { getAllProducts } from "@/api/product.api";
+import { addToCart } from "@/api/cart.api";
 
 export const Route = createFileRoute("/products/")({
   component: RouteComponent,
@@ -36,6 +37,7 @@ function RouteComponent() {
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const [category, setCategory] = useState<any>([]);
+  const [selectedCategories, setSelectedCategories] = useState<any>([]);
 
   const {
     call: getProductsCall,
@@ -43,7 +45,28 @@ function RouteComponent() {
     loading: loadingProducts,
     error: productsLoadError,
   } = useApi(getAllProducts);
-  const [cart, setCart] = useState<Item[]>([]);
+
+  const {
+    call: addToCartCall,
+    data: addToCartData,
+    loading: addToCartLoading,
+    error: addToCartError,
+  } = useApi(addToCart);
+
+  useEffect(() => {
+    if (addToCartLoading) {
+      toast.loading("Item is being added to cart...", {
+        id: "add-cart",
+      });
+    }
+  }, [addToCartLoading]);
+  useEffect(() => {
+    if (addToCartError) {
+      toast.error("Some error occured while adding to cart", {
+        id: "add-cart",
+      });
+    }
+  }, [addToCartError]);
 
   useEffect(() => {
     getProductsCall();
@@ -88,30 +111,9 @@ function RouteComponent() {
       document.body.appendChild(script);
     });
   };
-  const getCart = async () => {
-    try {
-      const url = import.meta.env.VITE_SERVER_URL;
-      const res = await fetch(url + "/api/products/cart/details", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      })
-        .then((r) => r.json())
-        .catch((e) => toast.error("Some error occured" + e));
-      if (res.statusCode == 200) {
-        toast.success(res.message);
-        setCart(res.data);
-        console.log(res.data);
-      } else {
-        toast.error(res.message);
-      }
-    } catch (e) {
-      return toast.error("Some error occured");
-    }
-  };
+
   useEffect(() => {
     loadScript("https://checkout.razorpay.com/v1/checkout.js");
-    getCart();
   }, []);
 
   useEffect(() => {
@@ -164,46 +166,44 @@ function RouteComponent() {
     }
   };
 
-  const addToCart = async (productId: string, quantity: number) => {
-    try {
-      const url = import.meta.env.VITE_SERVER_URL;
-      const res = await fetch(url + "/api/products/addToCart", {
-        method: "POST",
-        body: JSON.stringify({ product: productId, quantity: quantity }),
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      })
-        .then((r) => r.json())
-        .catch((e) => toast.error("Some error occured" + e));
-      if (res.statusCode == 200) {
-        toast.success(res.message);
-        await getCart();
-      } else {
-        toast.error(res.message);
-      }
-    } catch (e) {
-      return toast.error("Some error occured");
-    }
-  };
-
   return (
     <>
       <SidebarProvider>
         <Drawer>
-          <AppSidebar prodCategories={category} />
+          <AppSidebar
+            prodCategories={category}
+            selectedCategories={selectedCategories}
+            setSelectedCategories={setSelectedCategories}
+          />
           <SidebarTrigger className="bg-white" />
-          <div className="grid grid-cols-3 space-x-4 mt-12">
+          <div className="grid grid-cols-3 space-x-4 mt-24 space-y-4">
             {productsData.length > 0 &&
-              productsData?.map((prod) => (
+              selectedCategories.length > 0 &&
+              productsData?.map(
+                (prod) =>
+                  selectedCategories.includes(prod.category) && (
+                    <ProductCard
+                      imageUri={
+                        "https://i.ibb.co/qM1kdnbt/517-BP179xk-L-UL500.jpg"
+                      }
+                      prod={prod}
+                      setSelectedProduct={setSelectedProduct}
+                      key={prod._id}
+                    />
+                  )
+              )}
+            {selectedCategories.length == 0 &&
+              productsData.length > 0 &&
+              productsData.map((prod) => (
                 <ProductCard
-                  imageUri={"https://i.ibb.co/qM1kdnbt/517-BP179xk-L-UL500.jpg"}
+                  imageUri="https://i.ibb.co/qM1kdnbt/517-BP179xk-L-UL500.jpg"
                   prod={prod}
                   setSelectedProduct={setSelectedProduct}
                   key={prod._id}
                 />
               ))}
           </div>
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <p className="text-white">Cart: </p>
             {cart.map((cartItem: { product: string; quantity: number }) => {
               return (
@@ -218,7 +218,7 @@ function RouteComponent() {
             >
               Proceed to Payment
             </button>
-          </div>
+          </div> */}
           <DrawerContent className="bg-black px-30">
             <DrawerHeader>
               <DrawerTitle className="text-white">Product Details</DrawerTitle>
@@ -269,11 +269,7 @@ function RouteComponent() {
                       rippleColor="black"
                       duration={400}
                       onClick={() => {
-                        // setCart([
-                        //   ...cart,
-                        //   { product: selectedProduct._id, quantity: quantity },
-                        // ]);
-                        addToCart(selectedProduct._id, quantity);
+                        addToCartCall(selectedProduct._id, quantity);
                       }}
                     >
                       Add to Cart
@@ -281,9 +277,11 @@ function RouteComponent() {
                   </div>
                 </div>
               </div>
-              <Button>Submit</Button>
+              {/* <Button>Submit</Button> */}
               <DrawerClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" className="w-3/5 mx-auto">
+                  Cancel
+                </Button>
               </DrawerClose>
             </DrawerFooter>
           </DrawerContent>

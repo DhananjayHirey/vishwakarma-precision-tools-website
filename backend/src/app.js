@@ -29,11 +29,13 @@ import productRoutes from "./routes/product.routes.js";
 import adminOrderRoutes from "./routes/order.routes.js";
 import paymentsRoutes from "./routes/payments.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import cartRoutes from "./routes/cart.routes.js";
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", adminOrderRoutes);
 app.use("/api/payments", paymentsRoutes);
-app.use('/api/admin',adminRoutes)
+app.use("/api/admin", adminRoutes);
+app.use("/api/cart", cartRoutes);
 app.use(errorMiddleware);
 
 export default app;

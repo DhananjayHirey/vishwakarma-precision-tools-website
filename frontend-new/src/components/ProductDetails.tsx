@@ -5,15 +5,15 @@ function ProductDetails({ selectedProduct }: any) {
   return (
     <>
       <MagicCard className="bg-zinc-800 rounded-2xl overflow-hidden ">
-        <div className="flex justify-between gap-12 w-full h-full">
+        <div className="flex justify-between items-center gap-12 w-full h-full">
           <Lens>
             <img
-              src={"https://i.ibb.co/qM1kdnbt/517-BP179xk-L-UL500.jpg"}
+              src={selectedProduct.signedImageUrl}
               alt=""
-              className="rounded-none w-100"
+              className="rounded-none w-80"
             />
           </Lens>
-          <div className="flex flex-col flex-1 p-12 ps-4">
+          <div className="flex flex-col flex-1 p-2 ps-4">
             <div className="flex justify-between">
               <p className="text-white text-md text-start font-light flex flex-col">
                 <span className="display-block">
