@@ -2,6 +2,8 @@ import { createRazorpayInstance } from "../config/razorpay.config.js";
 import crypto from "crypto";
 import { Product } from "../models/product.model.js";
 import { calculatePrice } from "../utils/calculatePrice.js";
+import { User } from "../models/user.model.js";
+import { Order } from "../models/orders.model.js";
 const razorpayInstance = createRazorpayInstance();
 
 // order format -->
@@ -13,11 +15,9 @@ const razorpayInstance = createRazorpayInstance();
 // ]
 
 export const createOrder = async (req, res) => {
-  // console.log(res);
-  // return;
-
-  const { orderObject } = req.body;
-  // calculate amount
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  const orderObject = user.cartItems;
   const amount = await calculatePrice(orderObject);
   // console.log(amount);
   if (amount === NaN) {
@@ -51,18 +51,61 @@ export const createOrder = async (req, res) => {
 };
 
 export const verifyPayment = async (req, res) => {
-  const { order_id, payment_id, signature } = req.body;
+  const {
+    order_id,
+    payment_id,
+    signature,
+    email,
+    shippingAddress,
+    orderDate,
+    eta,
+    totalBilling,
+    TIN,
+  } = req.body;
   const secret = process.env.RZP_TEST_KEY_SECRET;
   const hmac = crypto.createHmac("sha256", secret);
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  const orderObject = user.cartItems;
+  console.log(orderObject);
   hmac.update(order_id + "|" + payment_id);
   const generatedSignature = hmac.digest("hex");
 
   if (generatedSignature === signature) {
     // db operations on payment successful
-    return res.status(200).json({
-      success: true,
-      message: "Payment verified",
+
+    orderObject.forEach(async (oo) => {
+      await Product.findByIdAndUpdate(
+        oo.product,
+        {
+          $inc: { sales: oo.quantity },
+        },
+        {
+          new: true,
+        }
+      );
     });
+
+    const order = await Order.create({
+      email,
+      shippingAddress,
+      orderDate,
+      eta,
+      totalBilling,
+      TIN,
+      orderList: orderObject,
+      orderingParty: userId,
+      paymentStatus: true,
+    });
+
+    if (order) {
+      user.cartItems = [];
+      user.save();
+      return res.status(200).json({
+        success: true,
+        message: "Payment verified",
+      });
+    }
   } else {
     return res.status(400).json({
       success: false,

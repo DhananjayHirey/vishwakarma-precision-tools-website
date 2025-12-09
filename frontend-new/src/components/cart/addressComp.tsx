@@ -1,6 +1,5 @@
 // import * as React from "react";
 import { ChevronDownIcon, Info } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
@@ -19,8 +18,6 @@ import {
 
 interface AddressCompProps {
   date: Date;
-  address: string;
-  tin: number;
   setAddress: React.Dispatch<React.SetStateAction<string>>;
   setTin: React.Dispatch<React.SetStateAction<string>>;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
@@ -28,19 +25,28 @@ interface AddressCompProps {
 
 export default function AddressComp({
   date,
-  address,
   setAddress,
-  email,
   setEmail,
-  tin,
   setTin,
 }: AddressCompProps) {
   const [open, setOpen] = useState(false);
+
   return (
     <div className="flex flex-col gap-3 min-w-120">
-      <Label htmlFor="date" className="px-1">
-        Date of birth:
-      </Label>
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Label className="px-1">
+            Estimated Time of Arrival :
+            <span>
+              <Info size={18} className="my-auto cursor-pointer" />
+            </span>
+          </Label>
+        </HoverCardTrigger>
+        <HoverCardContent>
+          <p>For urgent orders please make a custom order from here</p>
+          <Button className="mt-1">Custom Order</Button>
+        </HoverCardContent>
+      </HoverCard>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -57,7 +63,7 @@ export default function AddressComp({
             mode="single"
             selected={date}
             captionLayout="dropdown"
-            onSelect={(date) => {
+            onSelect={() => {
               setOpen(false);
             }}
           />
@@ -83,7 +89,7 @@ export default function AddressComp({
       </HoverCard>
       <Input onChange={(e) => setTin(e.target.value)} />
       <Label>Email Address: (Sales Dept.)</Label>
-      <Input />
+      <Input onChange={(e) => setEmail(e.target.value)} />
     </div>
   );
 }

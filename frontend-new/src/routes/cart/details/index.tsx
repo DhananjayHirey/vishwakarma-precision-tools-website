@@ -16,6 +16,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Trash2 } from "lucide-react";
 import AddressComp from "@/components/cart/addressComp";
+import z from "zod";
+import axios from "axios";
 
 export const Route = createFileRoute("/cart/details/")({
   component: RouteComponent,
@@ -97,6 +99,91 @@ function RouteComponent() {
     }
   }, [cartError]);
 
+  const loadScript = (src: string) => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
+  useEffect(() => {
+    loadScript("https://checkout.razorpay.com/v1/checkout.js");
+  }, []);
+
+  const onPayment = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/payments/createOrder",
+        {},
+        { withCredentials: true }
+      );
+      const data = res.data;
+      console.log(data);
+
+      const paymentObject = new (window as any).Razorpay({
+        key: import.meta.env.VITE_APP_RZP_TEST_API_KEY,
+        order_id: data.id,
+        ...data,
+        handler: function (response: any) {
+          console.log(response);
+          const options = {
+            order_id: response.razorpay_order_id,
+            payment_id: response.razorpay_payment_id,
+            signature: response.razorpay_signature,
+            email: email,
+            shippingAddress: address,
+            orderDate: new Date(),
+            eta: new Date(cartData.eta),
+            totalBilling: totalAmount,
+            TIN: tin,
+          };
+          axios
+            .post("http://localhost:5000/api/payments/verifyPayment", options, {
+              withCredentials: true,
+            })
+            .then((res) => {
+              console.log(res.data);
+              if (res.data.success) {
+                // alert("Payment Successful");
+                toast.success(
+                  "Payment Verified. Your order has been placed successfully!"
+                );
+              } else {
+                console.log("Payment failed");
+              }
+            })
+            .catch((e) => {
+              console.log(e);
+            });
+          getCartCall();
+        },
+      });
+      paymentObject.open();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  async function handleCheckout() {
+    try {
+      if (email.length <= 0 || tin.length < 10 || tin.length > 10 || !address) {
+        return toast.error(
+          "Please provide a proper Email or TIN or Shipping Address"
+        );
+      }
+      await onPayment();
+      console.log("handle");
+    } catch (e) {
+      console.error(e);
+    }
+  }
   return (
     <>
       <div className="flex justify-center mt-24 gap-12">
@@ -182,6 +269,7 @@ function RouteComponent() {
             <Button
               className="bg-zinc-100 text-zinc-900 hover:bg-white font-semibold"
               disabled={cart.length === 0}
+              onClick={() => handleCheckout()}
             >
               Checkout
             </Button>
@@ -190,11 +278,8 @@ function RouteComponent() {
         {cartData && (
           <AddressComp
             date={new Date(cartData.eta)}
-            tin={tin}
             setTin={setTin}
-            email={email}
             setEmail={setEmail}
-            address={address}
             setAddress={setAddress}
           />
         )}

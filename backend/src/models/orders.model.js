@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const orderSchema = mongoose.Schema({
   orderList: [
     {
-      productId: {
+      product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
@@ -18,8 +18,8 @@ const orderSchema = mongoose.Schema({
   TIN: String,
   email: String,
   orderDate: Date,
-  expectedDateByClient: Date,
-  eta: Date || null,
+  expectedDateByClient: { type: Date, default: null },
+  eta: { type: Date, default: null },
   paymentStatus: Boolean,
   totalBilling: Number,
   orderStatus: {

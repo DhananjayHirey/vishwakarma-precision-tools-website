@@ -1,9 +1,5 @@
 import express from "express";
 const router = express.Router();
-// import {
-//   createOrder,
-//   verifyPayment,
-// } from "../controllers/payments.controller.js";
 
 import {
   createOrder,

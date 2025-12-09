@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useActionState, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import ProductDetails from "@/components/ProductDetails";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { RippleButton } from "@/components/ui/ripple-button";
 import { useApi } from "@/api/useFetch";
 import { getAllProducts } from "@/api/product.api";
@@ -52,6 +52,8 @@ function RouteComponent() {
     loading: addToCartLoading,
     error: addToCartError,
   } = useApi(addToCart);
+
+  const nav = useNavigate();
 
   useEffect(() => {
     if (addToCartLoading) {
@@ -98,73 +100,10 @@ function RouteComponent() {
     }
   }, [productsLoadError]);
 
-  const loadScript = (src: string) => {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.onload = () => {
-        resolve(true);
-      };
-      script.onerror = () => {
-        resolve(false);
-      };
-      document.body.appendChild(script);
-    });
-  };
-
-  useEffect(() => {
-    loadScript("https://checkout.razorpay.com/v1/checkout.js");
-  }, []);
-
   useEffect(() => {
     const cat = [...new Set(productsData.map((p) => p?.category))];
     setCategory(cat);
   }, [productsData]);
-
-  const onPayment = async (orderObject: Item[]) => {
-    if (orderObject.length == 0) {
-      return alert("Please add a product to your cart first");
-    } else console.log(orderObject);
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/payments/createOrder",
-        { orderObject },
-        { withCredentials: true }
-      );
-      const data = res.data;
-      console.log(data);
-
-      const paymentObject = new (window as any).Razorpay({
-        key: import.meta.env.VITE_APP_RZP_TEST_API_KEY,
-        order_id: data.id,
-        ...data,
-        handler: function (response: any) {
-          console.log(response);
-          const options = {
-            order_id: response.razorpay_order_id,
-            payment_id: response.razorpay_payment_id,
-            signature: response.razorpay_signature,
-          };
-          axios
-            .post("http://localhost:5000/api/payments/verifyPayment", options)
-            .then((res) => {
-              console.log(res.data);
-              if (res.data.success) {
-                alert("Payment Successful");
-              } else {
-                console.log("Payment failed");
-              }
-            })
-            .catch((e) => {
-              console.log(e);
-            });
-        },
-      });
-      paymentObject.open();
-    } catch (e) {
-      console.log(e);
-    }
-  };
 
   return (
     <>
@@ -203,8 +142,17 @@ function RouteComponent() {
                 />
               ))}
           </div>
-          {/* <div className="flex flex-col">
-            <p className="text-white">Cart: </p>
+          <div
+            className="flex flex-col bg-zinc-900 flex-1 m-4 mt-16 rounded-2xl max-h-60 p-2 hover:bg-zinc-800 cursor-pointer"
+            onClick={() => nav({ to: "/cart/details" })}
+          >
+            <div className="border-2 border-dashed border-zinc-300 h-full rounded-2xl flex flex-col justify-center items-center">
+              <div className="rounded-full p-4">
+                <ShoppingCart color="white" size={36} className="mx-auto" />
+                <p>View Cart</p>
+              </div>
+            </div>
+            {/* <p className="text-white">Cart: </p>
             {cart.map((cartItem: { product: string; quantity: number }) => {
               return (
                 <p className="text-white" key={cartItem.product}>
@@ -217,8 +165,8 @@ function RouteComponent() {
               onClick={() => onPayment(cart)}
             >
               Proceed to Payment
-            </button>
-          </div> */}
+            </button> */}
+          </div>
           <DrawerContent className="bg-black px-30">
             <DrawerHeader>
               <DrawerTitle className="text-white">Product Details</DrawerTitle>

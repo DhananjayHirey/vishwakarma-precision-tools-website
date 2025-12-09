@@ -285,19 +285,20 @@ const getCart = asyncHandler(async (req, res) => {
       });
     }
 
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          {
-            totalAmount: totalAmount,
-            products: products,
-            eta: Date.now() + totalDays + 2,
-          },
-          "Cart Items fetched successfully"
-        )
-      );
+    const date = new Date();
+    date.setDate(date.getDate() + totalDays + 2);
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          totalAmount: totalAmount,
+          products: products,
+          eta: date,
+        },
+        "Cart Items fetched successfully"
+      )
+    );
   } catch (e) {
     return res
       .status(500)
