@@ -90,6 +90,7 @@ const getAllCustomOrders = asyncHandler(async (req, res) => {
         customOrderDetails: 1,
         customOrderAttachment: 1,
         customOrderReviewStatus: 1,
+        expectedDateByClient: 1,
         orderDate: 1,
         orderingParty: {
           name: "$user.name",
@@ -110,7 +111,7 @@ const getAllCustomOrders = asyncHandler(async (req, res) => {
       ) {
         const signedUrlResult = await getSignedUrlFromCloudinary(
           order.customOrderAttachment,
-          "auto",
+          "image",
           "authenticated"
         );
         signedAttachmentUrl = signedUrlResult;
@@ -158,9 +159,9 @@ const placeOrder = asyncHandler(async (req, res) => {
 });
 
 const placeCustomOrder = asyncHandler(async (req, res) => {
-  const { orderingParty, customOrderDetails, expectedDateByClient } = req.body;
+  const { customOrderDetails, expectedDateByClient } = req.body;
 
-  if (!orderingParty || !customOrderDetails) {
+  if (!customOrderDetails || !expectedDateByClient) {
     throw new ApiError(400, "Missing required fields");
   }
 
@@ -170,7 +171,7 @@ const placeCustomOrder = asyncHandler(async (req, res) => {
   if (attachmentPath) {
     uploadedAttachment = await uploadToCloudinary(
       attachmentPath,
-      `${APP_NAME}/custom_orders/${orderingParty}-${Date.now()}`,
+      `${APP_NAME}/custom_orders/${req.user._id}-${Date.now()}`,
       path.basename(attachmentPath),
       "auto",
       "authenticated"
@@ -178,14 +179,13 @@ const placeCustomOrder = asyncHandler(async (req, res) => {
   }
 
   const order = await Order.create({
-    orderingParty,
+    orderingParty: req.user._id,
     customOrderDetails,
     expectedDateByClient: expectedDateByClient
       ? new Date(expectedDateByClient)
       : null,
     isCustomOrder: true,
-    customOrderStatus: "pending-review",
-    orderStatus: null, // not a real order yet
+    orderStatus: "pending",
     paymentStatus: false,
     totalBilling: null,
     customOrderAttachment: uploadedAttachment?.public_id || null,

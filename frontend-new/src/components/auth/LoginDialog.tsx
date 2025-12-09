@@ -58,11 +58,11 @@ const LoginDialog = ({ open, onClose, onSwitchToSignup }: LoginDialogProps) => {
             
             toast.success("Login successful!");
             dispatch(loginSuccess(res.user))
-            console.log("Login Response:", data.user);
-            onClose();
-        } catch {
-            console.log(error);
-            toast.error(error);
+            console.log("Login Response:", res.user);
+            handleClose();
+        } catch(err:any) {
+            console.log(err);
+            toast.error(err);
         }
 
     }
@@ -74,7 +74,7 @@ const LoginDialog = ({ open, onClose, onSwitchToSignup }: LoginDialogProps) => {
             setIdentifier("");
             setPassword("");
         };
-    }, [open, error]);
+    }, [open]);
 
 
 
