@@ -6,15 +6,21 @@ import {
   getAllOrders,
   updateOrderStatus,
   updatePaymentStatus,
+  placeCustomOrder,
+  getAllCustomOrders,
+  updateCustomOrderStatus,
 } from "../controllers/order.controller.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 
 const router = Router();
 
+router.use(verifyJWT)
 router.post("/placeOrder", placeOrder);
-router.use(verifyJWT,adminRoute)
+router.post('/placeCustomOrder', upload.single('customOrderAttachment'), placeCustomOrder);
 router.get("/getAllOrders", getAllOrders);
-router.patch("/updateOrderStatus", updateOrderStatus);
-router.patch('/updatePaymentStatus',updatePaymentStatus)
-
+router.patch("/updateOrderStatus",adminRoute, updateOrderStatus);
+router.patch("/updateCustomOrderStatus",adminRoute, updateCustomOrderStatus);
+router.patch('/updatePaymentStatus',adminRoute, updatePaymentStatus)
+router.get('/getAllCustomOrders', getAllCustomOrders);
 export default router;

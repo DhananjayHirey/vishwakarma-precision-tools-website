@@ -67,8 +67,6 @@ function RouteComponent() {
                             <div className="grid grid-cols-3 gap-6">
                                 <OrdersSection showQuickView />
                                 <CustomOrdersSection
-                                    customOrders={customOrders}
-                                    onUpdateStatus={updateCustomOrderStatus}
                                     showQuickView
                                 />
                                 <ProductsSection
@@ -81,7 +79,7 @@ function RouteComponent() {
                     {activeSection === "orders" && <OrdersSection  />}
 
                     {activeSection === "custom" && (
-                        <CustomOrdersSection customOrders={customOrders} onUpdateStatus={updateCustomOrderStatus} />
+                        <CustomOrdersSection />
                     )}
 
                     {activeSection === "products" && (

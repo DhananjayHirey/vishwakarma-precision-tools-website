@@ -34,6 +34,20 @@ const orderSchema = mongoose.Schema({
     default: "pending",
   },
   // order Status can be Pending to be accepted, Manufacturing, Out for Delivery, Delivered,rejected
+  isCustomOrder: { type: Boolean, default: false },
+  customOrderDetails: {
+    type: String,
+    default: "",
+  },
+  customOrderAttachment:{
+    type: String,
+    default: "",
+  },
+  customOrderReviewStatus:{
+    type: String,
+    enum: ["pending","approved","rejected"],
+    default:"pending",
+  }
 });
 
 export const Order = mongoose.model("Order", orderSchema);

@@ -148,7 +148,7 @@ const updateProductDetails = asyncHandler(async (req, res) => {
     if (oldImagePublicId) {
       const url = await getUrlFromCloudinaryPublicId(oldImagePublicId, "image");
       console.log(`Deleting old image from Cloudinary: ${url}`);
-      await deleteFileFromCloudinary(oldImagePublicId, "image");
+      await deleteFileFromCloudinary(url, "image");
     }
 
     const productImageResult = await uploadToCloudinary(
@@ -300,6 +300,8 @@ const getCart = asyncHandler(async (req, res) => {
       )
     );
   } catch (e) {
+    console.log(e);
+    
     return res
       .status(500)
       .json(

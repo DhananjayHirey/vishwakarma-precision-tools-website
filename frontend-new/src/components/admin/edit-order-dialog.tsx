@@ -37,8 +37,10 @@ export function EditOrderDialog({ order, open, onOpenChange, onSave, loading }: 
     }, [order])
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+        <Dialog open={open} onOpenChange={onOpenChange} >
+            <DialogContent onInteractOutside={(e)=>e.preventDefault
+                ()
+            } className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Edit Order Status</DialogTitle>
                 </DialogHeader>
