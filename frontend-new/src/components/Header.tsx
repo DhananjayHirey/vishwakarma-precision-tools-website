@@ -1,4 +1,3 @@
-"use client"
 
 import { useState } from "react"
 import {
@@ -18,12 +17,21 @@ import LogoutDialog from "./auth/LogoutDialog";
 import { SignUpDialog } from "./auth/SignUpDialog";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import CustomOrderDialog from "./cart/custom-order-dialog";
 
 export function Header() {
 	const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated)
-	const isAdmin = useAppSelector(state => state.auth.user?.role === 'admin')
-	console.log("Authenticated:", isAuthenticated);
+	const user = useAppSelector(state => state.auth.user)
+	const isAdmin = user?.role === 'admin'
 	const navigate = useNavigate()
 	const location = useLocation()
 
@@ -31,13 +39,10 @@ export function Header() {
 	const [activeDialog, setActiveDialog] = useState<string | null>(null)
 
 	const navItems = [
-		// { name: "Home", link: "/" },
-		{ name: "About", link: "/about" },
+		// { name: "About", link: "/about" },
 		{ name: "Products", link: "/products" },
 		{ name: "Contact", link: "/contact" },
 	]
-
-
 
 	return (
 		<main className="fixed w-full z-50 top-0">
@@ -45,12 +50,18 @@ export function Header() {
 			<Nav className="px-3 py-2 z-20">
 				{/* Desktop Navigation */}
 				<NavBody>
-					{/* <NavbarLogo /> */}
-					<span className="font-bold  text-2xl cursor-pointer z-40  font-sans" onClick={()=>navigate({to:'/'})}> &lt;VP&gt;</span>
+					<span
+						className="font-bold  text-2xl cursor-pointer z-40  font-sans"
+						onClick={() => navigate({ to: '/' })}
+					>
+						&lt;VP&gt;
+					</span>
+
 					<NavItems items={navItems} />
+
+					{/* Profile + Auth Actions */}
 					{!isAuthenticated ? (
 						<div className="flex gap-4">
-
 							<NavbarButton variant="gradient" className="px-5" onClick={() => setActiveDialog("login")}>
 								Login
 							</NavbarButton>
@@ -59,13 +70,43 @@ export function Header() {
 							</NavbarButton>
 						</div>
 					) : (
-						<div className="flex gap-4">
-							{(isAdmin && location.pathname != '/admin') && <NavbarButton variant="gradient" className="px-5" onClick={()=>navigate({to:'/admin'})}>
-								Dashboard
-							</NavbarButton>}
-							<NavbarButton variant="dark" className="bg-trans rounded-2xl flex hover:scale-none  gap-2  text-white hover:bg-white/15" onClick={() => setActiveDialog("logout")}>
-								<LogOut className="h-5 w-5"/>
-							</NavbarButton>
+						<div className="flex items-center gap-4">
+							{/* {(isAdmin && location.pathname != '/admin') && (
+								<NavbarButton variant="gradient" className="px-5" onClick={() => navigate({ to: '/admin' })}>
+									Dashboard
+								</NavbarButton>
+							)} */}
+
+							<DropdownMenu>
+								<DropdownMenuTrigger className="outline-none">
+									<Avatar className="cursor-pointer border h-12 w-12">
+										<AvatarImage src={user?.avatar || ""} />
+										<AvatarFallback className="bg-gray-700 text-white">
+											{user?.name?.[0] || "U"}
+										</AvatarFallback>
+									</Avatar>
+								</DropdownMenuTrigger>
+
+								<DropdownMenuContent className="w-48">
+									<DropdownMenuLabel>My Account</DropdownMenuLabel>
+									<DropdownMenuSeparator />
+									{(isAdmin && location.pathname != '/admin') && (
+										<DropdownMenuItem className="px-5 text-center cursor-pointer" onClick={() => navigate({ to: '/admin' })}>
+											Admin Dashboard
+										</DropdownMenuItem>
+									)}
+									<DropdownMenuItem className="px-5 text-center cursor-pointer" onClick={() => setActiveDialog("customOrder")}>
+										Custom Order
+									</DropdownMenuItem>
+										{/* <DropdownMenuItem className="px-5 text-center cursor-pointer" onClick={() => navigate({ to: "/" })}>
+											Settings
+										</DropdownMenuItem> */}
+									<DropdownMenuSeparator />
+									<DropdownMenuItem className="px-5 text-center cursor-pointer" onClick={() => setActiveDialog("logout")}>
+										<LogOut className="h-4 w-4 mr-2" /> Logout
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
 					)}
 				</NavBody>
@@ -73,7 +114,7 @@ export function Header() {
 				{/* Mobile Navigation */}
 				<MobileNav>
 					<MobileNavHeader>
-						<span className="font-bold text-md font-sans">&lt;/&gt;</span>
+						<span className="font-bold text-md font-sans">&lt;VP&gt;</span>
 						<MobileNavToggle
 							isOpen={isMobileMenuOpen}
 							onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -94,31 +135,50 @@ export function Header() {
 								<span className="block">{item.name}</span>
 							</a>
 						))}
-						<div className="flex w-full justify-center flex-col gap-4">
-							<NavbarButton
-								onClick={() => setIsMobileMenuOpen(false)}
-								variant="secondary"
 
-							>
-								Login
-							</NavbarButton>
-						</div>
+						{/* AUTH + PROFILE MOBILE */}
+						{!isAuthenticated ? (
+							<div className="flex w-full flex-col gap-3">
+								<NavbarButton variant="secondary" onClick={() => {
+									setActiveDialog("login");
+									setIsMobileMenuOpen(false);
+								}}>
+									Login
+								</NavbarButton>
+								<NavbarButton variant="secondary" onClick={() => {
+									setActiveDialog("signup");
+									setIsMobileMenuOpen(false);
+								}}>
+									Signup
+								</NavbarButton>
+							</div>
+						) : (
+							<div className="flex w-full flex-col gap-3">
+								<button className="text-left py-2" onClick={() => navigate({ to: "/" })}>
+									👤 Profile
+								</button>
+								<button className="text-left py-2" onClick={() => navigate({ to: "/" })}>
+									⚙️ Settings
+								</button>
+								<NavbarButton
+									variant="secondary"
+									onClick={() => {
+										setActiveDialog("logout");
+										setIsMobileMenuOpen(false);
+									}}
+									className="flex items-center gap-2"
+								>
+									<LogOut className="h-5 w-5" /> Logout
+								</NavbarButton>
+							</div>
+						)}
 					</MobileNavMenu>
 				</MobileNav>
-				<LoginDialog
-					open={activeDialog === "login"}
-					onClose={() => setActiveDialog(null)}
-					onSwitchToSignup={() => setActiveDialog("signup")}
-				/>
-				<LogoutDialog
-					open={activeDialog === "logout"}
-					onClose={() => setActiveDialog(null)}
-				/>
-				<SignUpDialog
-					open={activeDialog === "signup"}
-					onClose={() => setActiveDialog(null)}
-					onSwitchToLogin={() => setActiveDialog("login")}
-				/>
+
+				<LoginDialog open={activeDialog === "login"} onClose={() => setActiveDialog(null)} onSwitchToSignup={() => setActiveDialog("signup")} />
+				<LogoutDialog open={activeDialog === "logout"} onClose={() => setActiveDialog(null)} />
+				<SignUpDialog open={activeDialog === "signup"} onClose={() => setActiveDialog(null)} onSwitchToLogin={() => setActiveDialog("login")} />
+				<CustomOrderDialog open={activeDialog === "customOrder"} onClose={() => setActiveDialog(null)} />
 			</Nav>
 		</main>
 	)

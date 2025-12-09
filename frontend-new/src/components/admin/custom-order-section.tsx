@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { ChevronRight } from "lucide-react"
 import { useApi } from "@/api/useFetch"
 import { getCustomOrders, updateCustomOrderStatus } from "@/api/orders.api"
+import { ShineBorder } from "../ui/shine-border"
 
 interface CustomOrder {
     _id: string
@@ -22,6 +24,7 @@ interface CustomOrder {
     customOrderReviewStatus: "pending" | "approved" | "rejected"
     eta?: string | null
     totalBilling?: number | null
+    expectedDateByClient?: string | null
 }
 
 interface CustomOrdersSectionProps {
@@ -42,11 +45,18 @@ export default function CustomOrdersSection({ showQuickView }: CustomOrdersSecti
 
     const [status, setStatus] = useState<CustomOrder["customOrderReviewStatus"]>("pending")
     const [eta, setEta] = useState("")
-    const [billing, setBilling] = useState("")
+    const [billing, setBilling] = useState(0)
 
     const { call: getOrders, loading } = useApi(getCustomOrders)
     const { call: updateStatus, loading: updateLoading } = useApi(updateCustomOrderStatus)
+    useEffect(() => {
+        if (selectedOrder) {
 
+            setStatus(selectedOrder.customOrderReviewStatus)
+            setEta(selectedOrder.eta || "")
+            setBilling(selectedOrder.totalBilling || 0)
+        }
+    }, [selectedOrder])
     useEffect(() => {
         async function fetchOrders() {
             const orders = await getOrders()
@@ -61,7 +71,7 @@ export default function CustomOrdersSection({ showQuickView }: CustomOrdersSecti
         setSelectedOrder(order)
         setStatus(order.customOrderReviewStatus)
         setEta(order.eta || "")
-        setBilling(order.totalBilling?.toString() || "")
+        setBilling(order.totalBilling || 0)
         setIsDialogOpen(true)
     }
 
@@ -88,9 +98,36 @@ export default function CustomOrdersSection({ showQuickView }: CustomOrdersSecti
 
     const displayOrders = showQuickView ? customOrders.slice(0, 3) : customOrders
 
+    if (loading) {
+        return (
+            <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-lg font-bold text-foreground">Custom Orders</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground text-center py-8">Loading...</p>
+                </CardContent>
+            </Card >
+        )
+    }
+
+    if (customOrders.length === 0) {
+        return (
+            <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-lg font-bold text-foreground">Custom Orders</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground text-center py-8">No custom orders</p>
+                </CardContent>
+            </Card>
+        )
+    }
+
     return (
         <>
             <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+                <ShineBorder className="rounded-2xl" shineColor={["green", "pink", "orange"]} />
                 <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-lg font-bold text-foreground">Custom Orders</CardTitle>
@@ -159,7 +196,7 @@ export default function CustomOrdersSection({ showQuickView }: CustomOrdersSecti
                         <div className="space-y-4 py-4">
 
                             {selectedOrder.signedAttachmentUrl && (
-                                <img src={selectedOrder.signedAttachmentUrl} className="rounded-lg mb-3" />
+                                <img src={selectedOrder.signedAttachmentUrl} className="rounded-lg mb-3 w-full  h-24 object-cover" />
                             )}
 
                             <div>
@@ -167,6 +204,10 @@ export default function CustomOrdersSection({ showQuickView }: CustomOrdersSecti
                                 <p className="text-foreground">{selectedOrder.orderingParty.name}</p>
                             </div>
 
+                            <div className="">
+                                <p className="text-sm font-medium text-muted-foreground">Expected Delivery Date</p>
+                                <p className="text-foreground">{selectedOrder.expectedDateByClient ? new Date(selectedOrder.expectedDateByClient).toLocaleDateString() : "N/A"}</p>
+                            </div>
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Request</p>
                                 <p className="text-foreground">{selectedOrder.customOrderDetails}</p>
@@ -191,7 +232,7 @@ export default function CustomOrdersSection({ showQuickView }: CustomOrdersSecti
 
                             <div className="space-y-2">
                                 <Label>Total Billing (₹)</Label>
-                                <Input type="number" value={billing} onChange={(e) => setBilling(e.target.value)} />
+                                <Input type="number" value={billing} onChange={(e) => setBilling(Number(e.target.value))} />
                             </div>
                         </div>
 
