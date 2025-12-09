@@ -69,3 +69,14 @@ export const updatePaymentStatus = async (orderId: string, paymentStatus: string
         throw error.message;
     }
 }
+
+export const getUserOrders = async()=>{
+    try{
+        const res = await apiClient.get<ApiSuccessResponse>('/orders/all')
+        // console.log(res.data)
+        return res.orders;        
+    }catch(e:any){
+        console.error("Error getting orders",e);
+        throw e.message;        
+    }
+}

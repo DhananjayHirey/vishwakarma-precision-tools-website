@@ -19,16 +19,17 @@ function ProductCard({ imageUri, prod, setSelectedProduct }: ProductCardProps) {
       </div>
 
       {/* NAME */}
-      <div className="flex justify-between items-center ps-4 w-full">
-        <span className="font-bold text-2xl mb-2 font-serif mt-2">
+      <div className="flex justify-between items-center px-4 w-full mt-2">
+        <span className="font-bold text-lg mb-2 font-serif mt-2">
           {prod.name}
         </span>
 
-        {/* CATEGORY */}
-        <span className="mx-auto text-center text-sm border-2 border-zinc-500 px-2 bg-zinc-700 max-w-fit rounded-full">
+        <span className="text-center text-sm border-2 border-zinc-700 px-2 bg-zinc-700 max-w-fit rounded-full">
           {prod.category}
         </span>
+        {/* CATEGORY */}
       </div>
+      {/* <div className="flex justify-end"></div> */}
 
       {/* PRICE + BUTTON */}
       <div className="flex justify-between items-center mx-4 mt-auto mb-4">

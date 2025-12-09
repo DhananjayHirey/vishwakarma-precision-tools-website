@@ -1,14 +1,57 @@
-import path from 'path'
+import path from "path";
 import { Order } from "../models/orders.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { APP_NAME } from "../constants.js";
-import { getSignedUrlFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
+import {
+  getSignedUrlFromCloudinary,
+  uploadToCloudinary,
+} from "../utils/cloudinary.js";
+const getUserOrders = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const orders = await Order.find({ orderingParty: userId }).populate(
+    "orderList.product"
+  );
+
+  for (const order of orders) {
+    for (const item of order.orderList) {
+      if (item.product?.image) {
+        const signedUrl = await getSignedUrlFromCloudinary(
+          item.product.image,
+          "image",
+          "authenticated"
+        );
+
+        item.product = {
+          ...item.product.toObject(),
+          signedImageUrl: signedUrl,
+        };
+      }
+    }
+    if (order.isCustomOrder && order.customOrderAttachment?.trim() !== "") {
+      const signedCustomUrl = await getSignedUrlFromCloudinary(
+        order.customOrderAttachment,
+        "image",
+        "authenticated"
+      );
+
+      order.customOrderAttachmentSignedUrl = signedCustomUrl;
+    }
+  }
+
+  return res.status(200).json({
+    success: true,
+    orders,
+  });
+});
 
 const getAllOrders = asyncHandler(async (req, res) => {
   const isAdmin = req.user.role === "admin";
-  const orders = await Order.find(isAdmin ? {} : { orderingParty: req.user._id,isCustomOrder:false })
+  const orders = await Order.find(
+    isAdmin ? {} : { orderingParty: req.user._id, isCustomOrder: false }
+  )
     .populate({
       path: "orderList.product",
       select: "name price description",
@@ -16,7 +59,8 @@ const getAllOrders = asyncHandler(async (req, res) => {
     .populate({
       path: "orderingParty",
       select: "name email",
-    }).sort({ orderDate: -1 });
+    })
+    .sort({ orderDate: -1 });
 
   res
     .status(200)
@@ -36,8 +80,8 @@ const getAllCustomOrders = asyncHandler(async (req, res) => {
         from: "users",
         localField: "orderingParty",
         foreignField: "_id",
-        as: "user"
-      }
+        as: "user",
+      },
     },
     { $unwind: "$user" },
     {
@@ -50,31 +94,40 @@ const getAllCustomOrders = asyncHandler(async (req, res) => {
         orderingParty: {
           name: "$user.name",
           email: "$user.email",
-          _id: "$user._id"
-        }
-      }
+          _id: "$user._id",
+        },
+      },
     },
-    { $sort: { orderDate: -1 } }
+    { $sort: { orderDate: -1 } },
   ]);
 
-  const signedOrders = await Promise.all(orders.map(async (order) => {
-    let signedAttachmentUrl = null;
-    if (order.customOrderAttachment && order.customOrderAttachment.trim() !== "") {
-      const signedUrlResult = await getSignedUrlFromCloudinary(
-        order.customOrderAttachment,
-        "auto",
-        "authenticated")
-      signedAttachmentUrl = signedUrlResult;
-    }
-    return {
-      ...order,
-      signedAttachmentUrl,
-    };
-  }));
+  const signedOrders = await Promise.all(
+    orders.map(async (order) => {
+      let signedAttachmentUrl = null;
+      if (
+        order.customOrderAttachment &&
+        order.customOrderAttachment.trim() !== ""
+      ) {
+        const signedUrlResult = await getSignedUrlFromCloudinary(
+          order.customOrderAttachment,
+          "auto",
+          "authenticated"
+        );
+        signedAttachmentUrl = signedUrlResult;
+      }
+      return {
+        ...order,
+        signedAttachmentUrl,
+      };
+    })
+  );
 
-  res.status(200).json(new ApiResponse(200, signedOrders, "Custom Orders fetched successfully"));
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, signedOrders, "Custom Orders fetched successfully")
+    );
 });
-
 
 const placeOrder = asyncHandler(async (req, res) => {
   const orderObject = req.body;
@@ -127,7 +180,9 @@ const placeCustomOrder = asyncHandler(async (req, res) => {
   const order = await Order.create({
     orderingParty,
     customOrderDetails,
-    expectedDateByClient: expectedDateByClient ? new Date(expectedDateByClient) : null,
+    expectedDateByClient: expectedDateByClient
+      ? new Date(expectedDateByClient)
+      : null,
     isCustomOrder: true,
     customOrderStatus: "pending-review",
     orderStatus: null, // not a real order yet
@@ -137,9 +192,10 @@ const placeCustomOrder = asyncHandler(async (req, res) => {
     orderDate: new Date(),
   });
 
-  return res.status(201).json(new ApiResponse(201, order, "Request submitted."));
+  return res
+    .status(201)
+    .json(new ApiResponse(201, order, "Request submitted."));
 });
-
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
   const { orderId, statusString } = req.body;
@@ -155,7 +211,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 });
 
 const updateCustomOrderStatus = asyncHandler(async (req, res) => {
-  const { orderId, totalBilling,eta, customOrderReviewStatus } = req.body;
+  const { orderId, totalBilling, eta, customOrderReviewStatus } = req.body;
   const order = await Order.findById(orderId);
   if (!order) {
     throw new ApiError(400, "Could not find order");
@@ -166,7 +222,9 @@ const updateCustomOrderStatus = asyncHandler(async (req, res) => {
   await order.save();
   res
     .status(200)
-    .json(new ApiResponse(200, order, "Custom Order Status updated successfully"));
+    .json(
+      new ApiResponse(200, order, "Custom Order Status updated successfully")
+    );
 });
 const updatePaymentStatus = asyncHandler(async (req, res) => {
   const { orderId, paymentStatus } = req.body;
@@ -181,4 +239,13 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, order, "Payment Status updated successfully"));
 });
 
-export { getAllOrders, placeOrder, placeCustomOrder, updateOrderStatus, updateCustomOrderStatus, updatePaymentStatus, getAllCustomOrders };
+export {
+  getAllOrders,
+  placeOrder,
+  placeCustomOrder,
+  updateOrderStatus,
+  updateCustomOrderStatus,
+  updatePaymentStatus,
+  getAllCustomOrders,
+  getUserOrders,
+};

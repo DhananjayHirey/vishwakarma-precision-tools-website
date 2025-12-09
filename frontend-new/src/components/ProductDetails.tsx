@@ -4,7 +4,7 @@ import { Lens } from "@/components/ui/lens";
 function ProductDetails({ selectedProduct }: any) {
   return (
     <>
-      <MagicCard className="bg-zinc-800 rounded-2xl overflow-hidden ">
+      <MagicCard className="bg-zinc-800 rounded-2xl overflow-hidden p-4">
         <div className="flex justify-between items-center gap-12 w-full h-full">
           <Lens>
             <img
@@ -30,12 +30,7 @@ function ProductDetails({ selectedProduct }: any) {
             </div>
             <div>
               <p className="text-white text-start mt-8 max-w-5/7 text-lg">
-                {selectedProduct.description} Lorem ipsum dolor sit, amet
-                consectetur adipisicing elit. Ullam qui beatae, quia sapiente
-                mollitia ipsum placeat neque voluptates? Quisquam sint delectus
-                voluptas voluptatum, accusamus enim suscipit minima maiores,
-                sunt pariatur veniam repellendus blanditiis veritatis alias odio
-                ducimus rerum dolorem nemo.
+                {selectedProduct.description}
               </p>
               <div className="flex gap-2">
                 <div className="px-3 rounded-full text-white bg-zinc-700 mt-8">
