@@ -57,11 +57,11 @@ export const getSalesMetrics = asyncHandler(async (req, res, next) => {
                 name: "$product.name",
                 price: "$product.price",
                 image: "$product.image",
-                sold: 1
+                sales: 1
             }
         },
 
-        { $sort: { sold: -1 } },
+        { $sort: { sales: -1 } },
         { $limit: 5 }
     ]);
 

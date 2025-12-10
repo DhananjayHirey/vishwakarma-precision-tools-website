@@ -23,6 +23,7 @@ import { useApi } from "@/api/useFetch";
 import { getAllProducts } from "@/api/product.api";
 import { addToCart } from "@/api/cart.api";
 import { OrderComp } from "@/components/orders/OrderComp";
+import { useAppSelector } from "@/redux/hooks";
 
 export const Route = createFileRoute("/products/")({
   component: RouteComponent,
@@ -35,6 +36,7 @@ interface Item {
 }
 
 function RouteComponent() {
+  const isAuth = useAppSelector(state=>state.auth.isAuthenticated)
   const [productsData, setProductsData] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [quantity, setQuantity] = useState(0);
@@ -215,8 +217,13 @@ function RouteComponent() {
                         rippleColor="black"
                         duration={400}
                         onClick={() => {
+                          if(!isAuth){
+                            toast.error("Please login to purchase an item");
+                            return 
+                          }
                           addToCartCall(selectedProduct._id, quantity);
                         }}
+                        disabled={quantity===0}
                       >
                         Add to Cart
                       </RippleButton>

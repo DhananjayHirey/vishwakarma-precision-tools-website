@@ -15,6 +15,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import CustomOrderDialog from "./custom-order-dialog";
 
 interface AddressCompProps {
   date: Date;
@@ -30,7 +31,7 @@ export default function AddressComp({
   setTin,
 }: AddressCompProps) {
   const [open, setOpen] = useState(false);
-
+  const [dialogOpen, setDialogOpen] = useState(false);
   return (
     <div className="flex flex-col gap-3 min-w-120">
       <HoverCard>
@@ -44,8 +45,9 @@ export default function AddressComp({
         </HoverCardTrigger>
         <HoverCardContent>
           <p>For urgent orders please make a custom order from here</p>
-          <Button className="mt-1">Custom Order</Button>
+          <Button onClick={()=>setDialogOpen(true)} className="mt-1">Custom Order</Button>
         </HoverCardContent>
+        <CustomOrderDialog open={dialogOpen} onClose={()=>setDialogOpen(false)} />
       </HoverCard>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
