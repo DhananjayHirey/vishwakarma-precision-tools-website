@@ -8,6 +8,17 @@ import { useApi } from "@/api/useFetch"
 import { getAllOrders, updateOrderStatus, updatePaymentStatus } from "@/api/orders.api"
 import { ShineBorder } from "../ui/shine-border"
 
+export interface OrderListItem {
+    quantity: number;
+    product: {
+        _id: string;
+        name: string;
+        price: number;
+        image?: string;
+        signedImageUrl?: string;
+        description?: string;
+    }
+}
 export interface Order {
     id: string
     customer: string
@@ -15,7 +26,8 @@ export interface Order {
     total: number
     items: number
     paymentStatus: "completed" | "pending"
-    orderStatus: "pending" | "out for delivery" | "rejected" | "delivered" |  "manufacturing"
+    orderList: OrderListItem[]
+    orderStatus: "pending" | "out for delivery" | "rejected" | "delivered" | "manufacturing"
 }
 
 interface OrdersSectionProps {
@@ -30,7 +42,8 @@ const normalizeOrders = (apiOrders: any[]): Order[] => {
         total: order.totalBilling,
         items: order.orderList.reduce((sum: number, item: any) => sum + item.quantity, 0),
         paymentStatus: order.paymentStatus ? "completed" : "pending",
-        orderStatus: order.orderStatus
+        orderStatus: order.orderStatus,
+        orderList: order.orderList
     }))
 }
 
@@ -71,7 +84,7 @@ export default function OrdersSection({ showQuickView }: OrdersSectionProps) {
         try {
             // Only call payment API if changed
             if (paymentStatus !== selectedOrder.paymentStatus) {
-                const response = await updatePayment(selectedOrder.id, paymentStatus=== "completed");
+                const response = await updatePayment(selectedOrder.id, paymentStatus === "completed");
                 console.log("Payment update response:", response);
             }
 
@@ -85,7 +98,7 @@ export default function OrdersSection({ showQuickView }: OrdersSectionProps) {
             setOrders(prev =>
                 prev.map(order =>
                     order.id === selectedOrder.id
-                        ? { ...order, paymentStatus: paymentStatus as "completed" | "pending", orderStatus: orderStatus as "pending" | "out for delivery" | "rejected" | "delivered" |  "manufacturing" }
+                        ? { ...order, paymentStatus: paymentStatus as "completed" | "pending", orderStatus: orderStatus as "pending" | "out for delivery" | "rejected" | "delivered" | "manufacturing" }
                         : order
                 )
             );
@@ -101,8 +114,8 @@ export default function OrdersSection({ showQuickView }: OrdersSectionProps) {
     return (
         <>
             <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
-        <ShineBorder className="rounded-2xl" shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
-            
+                <ShineBorder className="rounded-2xl" shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+
                 <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-2xl font-bold text-foreground">Orders Overall</CardTitle>

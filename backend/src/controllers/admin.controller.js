@@ -36,7 +36,7 @@ export const getSalesMetrics = asyncHandler(async (req, res, next) => {
 
         {
             $group: {
-                _id: "$orderList.productId",
+                _id: "$orderList.product",
                 sold: { $sum: "$orderList.quantity" }
             }
         },

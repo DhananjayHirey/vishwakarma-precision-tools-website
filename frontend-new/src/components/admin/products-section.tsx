@@ -170,7 +170,7 @@ export default function ProductsSection({
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-semibold text-foreground truncate">{product.name}</p>
-                                                        <p className="text-xs text-muted-foreground truncate">{product.description}</p>
+                                                        {/* <p className="text-xs text-muted-foreground truncate">{product.description}</p> */}
                                                     </div>
                                                 </div>
                                             </td>

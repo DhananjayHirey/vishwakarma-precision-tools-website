@@ -249,70 +249,55 @@ const removeFromCart = asyncHandler(async (req, res) => {
 });
 
 const getCart = asyncHandler(async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    console.log(user);
-    if (!user) {
-      return res
-        .status(404)
-        .json(
-          new ApiResponse(
-            404,
-            null,
-            "Could not find User! Please try again after some time or login again!"
-          )
-        );
-    }
+  const userId = req.user._id;
+  const user = await User.findById(userId);
 
-    const products = [];
-    let totalAmount = 0;
-    let totalDays = 0;
-    for (let i = 0; i < user.cartItems.length; i += 1) {
-      const p = await Product.findById(user.cartItems[i].product);
-      totalAmount += user.cartItems[i].quantity * p.price;
-      totalDays += p.etp;
-      const signedImageUrl = await getSignedUrlFromCloudinary(
-        p.image,
-        "image",
-        "authenticated"
-      );
-      products.push({
-        product: p,
-        quantity: user.cartItems[i].quantity,
-        _id: user.cartItems[i]._id,
-        signedImageUrl: signedImageUrl,
-      });
-    }
-
-    const date = new Date();
-    date.setDate(date.getDate() + totalDays + 2);
-
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        {
-          totalAmount: totalAmount,
-          products: products,
-          eta: date,
-        },
-        "Cart Items fetched successfully"
-      )
-    );
-  } catch (e) {
-    console.log(e);
-    
-    return res
-      .status(500)
-      .json(
-        new ApiResponse(
-          500,
-          null,
-          "Some error occured while fetching cart! Please try again after some time"
-        )
-      );
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, null, "User not found"));
   }
+
+  const products = [];
+  let totalAmount = 0;
+  let totalDays = 0;
+
+  for (const item of user.cartItems) {
+    const p = await Product.findById(item.product).lean(); // ⬅️ makes it JSON-safe
+
+    if (!p) continue;
+
+    totalAmount += item.quantity * p.price;
+    totalDays += p.etp;
+
+    const signedImageUrl = await getSignedUrlFromCloudinary(
+      p.image,
+      "image",
+      "authenticated"
+    );
+
+    const productWithUrl = {
+      ...p,
+      signedImageUrl,
+    };
+
+    products.push({
+      _id: item._id,
+      quantity: item.quantity,
+      product: productWithUrl, // now contains name, price, image, signed url etc.
+    });
+  }
+
+  const eta = new Date();
+  eta.setDate(eta.getDate() + totalDays + 2);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { totalAmount, products, eta },
+      "Cart Items fetched successfully"
+    )
+  );
 });
+
 
 export {
   createProduct,

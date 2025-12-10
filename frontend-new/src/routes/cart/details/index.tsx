@@ -75,6 +75,7 @@ function RouteComponent() {
 
   useEffect(() => {
     if (cartData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCart(cartData.products);
       setTotalAmount(cartData.totalAmount);
       // console.log(cartData.eta);
@@ -117,11 +118,11 @@ function RouteComponent() {
     loadScript("https://checkout.razorpay.com/v1/checkout.js");
   }, []);
 
-  const onPayment = async () => {
+  const onPayment = async (payload:any) => {
     try {
       const res = await axios.post(
         import.meta.env.VITE_API_BASE_URL + "/payments/createOrder",
-        {},
+        payload,
         { withCredentials: true }
       );
       const data = res.data;
@@ -182,7 +183,13 @@ function RouteComponent() {
           "Please provide a proper Email or TIN or Shipping Address"
         );
       }
-      await onPayment();
+      await onPayment({
+        email,
+        TIN: tin,
+        shippingAddress: address,
+        eta: cartData.eta,
+        totalAmount
+      });
       console.log("handle");
     } catch (e) {
       console.error(e);

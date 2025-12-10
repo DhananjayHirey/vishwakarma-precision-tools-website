@@ -8,6 +8,7 @@ import {
   getSignedUrlFromCloudinary,
   uploadToCloudinary,
 } from "../utils/cloudinary.js";
+import { Product } from "../models/product.model.js";
 const getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
@@ -49,23 +50,60 @@ const getUserOrders = asyncHandler(async (req, res) => {
 
 const getAllOrders = asyncHandler(async (req, res) => {
   const isAdmin = req.user.role === "admin";
+
   const orders = await Order.find(
     isAdmin ? {} : { orderingParty: req.user._id, isCustomOrder: false }
   )
     .populate({
       path: "orderList.product",
-      select: "name price description",
+      select: "name price description image",
     })
     .populate({
       path: "orderingParty",
       select: "name email",
     })
-    .sort({ orderDate: -1 });
+    .sort({ orderDate: -1 })
+    .lean(); // ensures populated objects are plain JSON
 
-  res
+  const signedOrders = await Promise.all(
+    orders.map(async (order) => {
+      const updatedOrderList = await Promise.all(
+        order.orderList.map(async (item) => {
+          const product = item.product; // already populated + clean JSON
+
+          let signedImageUrl = null;
+          if (product?.image) {
+            
+            signedImageUrl = await getSignedUrlFromCloudinary(
+              product.image,
+              "image",
+              "authenticated"
+            );
+            
+          }
+
+          return {
+            quantity: item.quantity,
+            product: {
+              ...item.product,
+              signedImageUrl: signedImageUrl,
+            },
+          };
+        })
+      );
+
+      return {
+        ...order,
+        orderList: updatedOrderList,
+      };
+    })
+  );
+
+  return res
     .status(200)
-    .json(new ApiResponse(200, orders, "Orders fetched successfully"));
+    .json(new ApiResponse(200, signedOrders, "Orders fetched successfully"));
 });
+
 
 const getAllCustomOrders = asyncHandler(async (req, res) => {
   const isAdmin = req.user.role === "admin";

@@ -21,7 +21,7 @@ export const createOrder = async (req, res) => {
   const orderObject = user.cartItems;
   const amount = await calculatePrice(orderObject);
   // console.log(amount);
-  if (amount === NaN) {
+  if (isNaN(amount) || amount <= 0) {
     return res.status(500).json({
       success: false,
       message: "Some error occured while placing the order please try again",
@@ -34,7 +34,7 @@ export const createOrder = async (req, res) => {
     receipt: "receipt_order_1",
   };
   try {
-    razorpayInstance.orders.create(options, (err, order) => {
+    await razorpayInstance.orders.create(options, (err, order) => {
       if (err) {
         return res.status(500).json({
           success: false,

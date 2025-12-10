@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import type { OrderListItem } from "./order-section"
 
 interface Order {
     id: string
@@ -13,6 +14,7 @@ interface Order {
     items: number
     paymentStatus: string
     orderStatus: string
+    orderList?: OrderListItem[];
 }
 
 interface EditOrderDialogProps {
@@ -38,7 +40,7 @@ export function EditOrderDialog({ order, open, onOpenChange, onSave, loading }: 
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange} >
-            <DialogContent onInteractOutside={(e)=>e.preventDefault
+            <DialogContent onInteractOutside={(e) => e.preventDefault
                 ()
             } className="sm:max-w-[425px]">
                 <DialogHeader>
@@ -54,6 +56,44 @@ export function EditOrderDialog({ order, open, onOpenChange, onSave, loading }: 
                         <p className="text-sm font-medium text-muted-foreground">Customer</p>
                         <p className="text-foreground">{order.customer}</p>
                     </div>
+                    {/* Product List Section */}
+                    {order.orderList && order.orderList.length > 0 && (
+                        <div className="space-y-3">
+                            <p className="text-sm font-medium text-muted-foreground">Ordered Items</p>
+
+                            <div className="space-y-2">
+                                {order.orderList.map((item) => (
+                                    <div
+                                        key={item.product._id}
+                                        className="flex items-center gap-4 p-2 rounded-md border border-border/50"
+                                    >
+                                        {/* Product image */}
+                                        <div className="h-14 w-14 rounded bg-muted overflow-hidden flex items-center justify-center">
+                                            {item.product.signedImageUrl ? (
+                                                <img
+                                                    src={item.product.signedImageUrl}
+                                                    alt={item.product.name}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground">No Image</span>
+                                            )}
+                                        </div>
+
+                                        {/* Product info */}
+                                        <div className="flex flex-col">
+                                            <span className="font-medium text-foreground text-sm">
+                                                {item.product.name}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                                Qty: {item.quantity}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="space-y-3">
                         <Label htmlFor="payment-status">Payment Status</Label>
