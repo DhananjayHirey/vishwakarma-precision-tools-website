@@ -4,6 +4,7 @@ import { Product } from "../models/product.model.js";
 import { calculatePrice } from "../utils/calculatePrice.js";
 import { User } from "../models/user.model.js";
 import { Order } from "../models/orders.model.js";
+import { sendReceipt } from "../utils/sendReceipt.js";
 const razorpayInstance = createRazorpayInstance();
 
 // order format -->
@@ -67,24 +68,28 @@ export const verifyPayment = async (req, res) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   const orderObject = user.cartItems;
-  console.log(orderObject);
+  // console.log(orderObject);
   hmac.update(order_id + "|" + payment_id);
   const generatedSignature = hmac.digest("hex");
 
   if (generatedSignature === signature) {
-    // db operations on payment successful
+    const mailObject = [];
 
-    orderObject.forEach(async (oo) => {
-      await Product.findByIdAndUpdate(
+    for (const oo of orderObject) {
+      const p = await Product.findByIdAndUpdate(
         oo.product,
         {
           $inc: { sales: oo.quantity },
         },
-        {
-          new: true,
-        }
+        { new: true }
       );
-    });
+
+      mailObject.push({
+        name: p.name,
+        quantity: oo.quantity,
+        price: p.price,
+      });
+    }
 
     const order = await Order.create({
       email,
@@ -101,6 +106,7 @@ export const verifyPayment = async (req, res) => {
     if (order) {
       user.cartItems = [];
       user.save();
+      await sendReceipt(email, order._id, totalBilling, mailObject);
       return res.status(200).json({
         success: true,
         message: "Payment verified",
