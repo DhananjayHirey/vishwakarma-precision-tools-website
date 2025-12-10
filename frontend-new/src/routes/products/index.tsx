@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useActionState, useEffect, useState } from "react";
 import axios from "axios";
@@ -110,7 +111,7 @@ function RouteComponent() {
   }, [productsLoadError]);
 
   useEffect(() => {
-    const cat = [...new Set(productsData.map((p) => p?.category))];
+    const cat = [...new Set(productsData.map((p:any) => p?.category))];
     setCategory(cat);
   }, [productsData]);
 
@@ -151,7 +152,7 @@ function RouteComponent() {
 
                 {selectedCategories.length == 0 &&
                   productsData.length > 0 &&
-                  productsData.map((prod) => (
+                  productsData.map((prod:any) => (
                     <ProductCard
                       imageUri="https://i.ibb.co/qM1kdnbt/517-BP179xk-L-UL500.jpg"
                       prod={prod}

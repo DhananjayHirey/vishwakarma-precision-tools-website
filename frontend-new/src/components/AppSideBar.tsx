@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "./ui/separator";
 import { useNavigate } from "@tanstack/react-router";
+import CustomOrderDialog from "./cart/custom-order-dialog";
+import { useState } from "react";
 interface AppSideBarProps {
   prodCategories: string[];
   selectedCategories: string[];
-  orderOpen: Boolean;
+  orderOpen: boolean;
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
   setOrderOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -37,6 +39,9 @@ function AppSidebar({
     );
   };
   const nav = useNavigate();
+
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
 
   return (
     <Sidebar>
@@ -74,6 +79,7 @@ function AppSidebar({
                         <span className="ml-auto text-xs opacity-70">✓</span>
                       )}
                     </SidebarMenuButton>
+
                   </SidebarMenuItem>
                 );
               })}
@@ -95,11 +101,15 @@ function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton className={" cursor-pointer text-zinc-400"}>
-                  <span className="ps-4">Make a Custom Order</span>
+                <SidebarMenuButton onClick={()=>setDialogOpen(true)} className={" cursor-pointer text-zinc-400"}>
+                  <span className="ps-4" >Make a Custom Order</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
+            <CustomOrderDialog
+            open={dialogOpen}
+            onClose={()=>setDialogOpen(false)}
+            />
           </SidebarGroupContent>
         </SidebarGroup>
         <Separator />
