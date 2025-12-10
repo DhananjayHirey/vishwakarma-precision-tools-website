@@ -17,7 +17,7 @@ const router = Router();
 
 router
   .route("/register")
-  .post(upload.fields([{ name: "avatar", maxCount: 1 }]), registerUser);
+  .post(upload.single("avatar"), registerUser);
 router.route("/login").post(loginUser);
 
 router.use(verifyJWT); //routes below this middleware are protected and contain user info in req.user
