@@ -120,7 +120,7 @@ function RouteComponent() {
   const onPayment = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/payments/createOrder",
+        import.meta.env.VITE_API_BASE_URL + "/payments/createOrder",
         {},
         { withCredentials: true }
       );
@@ -145,9 +145,13 @@ function RouteComponent() {
             TIN: tin,
           };
           axios
-            .post("http://localhost:5000/api/payments/verifyPayment", options, {
-              withCredentials: true,
-            })
+            .post(
+              import.meta.env.VITE_API_BASE_URL + "/payments/verifyPayment",
+              options,
+              {
+                withCredentials: true,
+              }
+            )
             .then((res) => {
               console.log(res.data);
               if (res.data.success) {
