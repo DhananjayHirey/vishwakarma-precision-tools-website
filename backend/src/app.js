@@ -6,7 +6,10 @@ import { errorMiddleware } from "./middlewares/error.middleware.js";
 const app = express();
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: [
+      "http://localhost:5173" ||
+        "https://vishwakarma-precision-tools-website-phi.vercel.app/",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
