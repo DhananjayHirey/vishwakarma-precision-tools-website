@@ -1,14 +1,18 @@
 import { X } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { RippleButton } from "@/components/ui/ripple-button";
-import { toast } from "sonner";
 import { useApi } from "@/api/useFetch";
 import { login } from "@/api/auth.api";
 
 function AuthModal({ setAuthModalVisible, authModalVisible }) {
   const [isLoginForm, setIsLoginForm] = useState(true);
-  const { call: loginCall, data: loginData, loading: loginLoading, error: loginError } = useApi(login);
+  const {
+    call: loginCall,
+    data: loginData,
+    loading: loginLoading,
+    error: loginError,
+  } = useApi(login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -51,7 +55,7 @@ function AuthModal({ setAuthModalVisible, authModalVisible }) {
 
   function handleLogin() {
     // throw new Error("Function not implemented.");
-    loginCall({ email, password })
+    loginCall({ email, password });
   }
 
   async function handleRegister() {

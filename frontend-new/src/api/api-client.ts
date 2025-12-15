@@ -10,6 +10,7 @@ type HealthCheckResponse = {
 };
 
 export interface ApiSuccessResponse {
+    orders?: any;
     statusCode: string;
     data: any;
     message: string;
