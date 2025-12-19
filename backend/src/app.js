@@ -39,6 +39,9 @@ app.use("/api/orders", adminOrderRoutes);
 app.use("/api/payments", paymentsRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/cart", cartRoutes);
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
 app.use(errorMiddleware);
 
 export default app;
