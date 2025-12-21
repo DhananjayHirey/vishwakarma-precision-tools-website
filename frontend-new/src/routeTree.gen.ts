@@ -9,12 +9,36 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WhyChooseUsRouteImport } from './routes/why-choose-us'
+import { Route as TestimonialsRouteImport } from './routes/testimonials'
+import { Route as OurCustomersRouteImport } from './routes/our-customers'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ProductsProductIdRouteImport } from './routes/products/$productId'
 import { Route as CartDetailsIndexRouteImport } from './routes/cart/details/index'
 
+const WhyChooseUsRoute = WhyChooseUsRouteImport.update({
+  id: '/why-choose-us',
+  path: '/why-choose-us',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestimonialsRoute = TestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OurCustomersRoute = OurCustomersRouteImport.update({
+  id: '/our-customers',
+  path: '/our-customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +67,10 @@ const CartDetailsIndexRoute = CartDetailsIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/our-customers': typeof OurCustomersRoute
+  '/testimonials': typeof TestimonialsRoute
+  '/why-choose-us': typeof WhyChooseUsRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/admin': typeof AdminIndexRoute
   '/products': typeof ProductsIndexRoute
@@ -50,6 +78,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/our-customers': typeof OurCustomersRoute
+  '/testimonials': typeof TestimonialsRoute
+  '/why-choose-us': typeof WhyChooseUsRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/admin': typeof AdminIndexRoute
   '/products': typeof ProductsIndexRoute
@@ -58,6 +90,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/our-customers': typeof OurCustomersRoute
+  '/testimonials': typeof TestimonialsRoute
+  '/why-choose-us': typeof WhyChooseUsRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/admin/': typeof AdminIndexRoute
   '/products/': typeof ProductsIndexRoute
@@ -67,15 +103,32 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/contact'
+    | '/our-customers'
+    | '/testimonials'
+    | '/why-choose-us'
     | '/products/$productId'
     | '/admin'
     | '/products'
     | '/cart/details'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/products/$productId' | '/admin' | '/products' | '/cart/details'
+  to:
+    | '/'
+    | '/contact'
+    | '/our-customers'
+    | '/testimonials'
+    | '/why-choose-us'
+    | '/products/$productId'
+    | '/admin'
+    | '/products'
+    | '/cart/details'
   id:
     | '__root__'
     | '/'
+    | '/contact'
+    | '/our-customers'
+    | '/testimonials'
+    | '/why-choose-us'
     | '/products/$productId'
     | '/admin/'
     | '/products/'
@@ -84,6 +137,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContactRoute: typeof ContactRoute
+  OurCustomersRoute: typeof OurCustomersRoute
+  TestimonialsRoute: typeof TestimonialsRoute
+  WhyChooseUsRoute: typeof WhyChooseUsRoute
   ProductsProductIdRoute: typeof ProductsProductIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
@@ -92,6 +149,34 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/why-choose-us': {
+      id: '/why-choose-us'
+      path: '/why-choose-us'
+      fullPath: '/why-choose-us'
+      preLoaderRoute: typeof WhyChooseUsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/testimonials': {
+      id: '/testimonials'
+      path: '/testimonials'
+      fullPath: '/testimonials'
+      preLoaderRoute: typeof TestimonialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/our-customers': {
+      id: '/our-customers'
+      path: '/our-customers'
+      fullPath: '/our-customers'
+      preLoaderRoute: typeof OurCustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -132,6 +217,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContactRoute: ContactRoute,
+  OurCustomersRoute: OurCustomersRoute,
+  TestimonialsRoute: TestimonialsRoute,
+  WhyChooseUsRoute: WhyChooseUsRoute,
   ProductsProductIdRoute: ProductsProductIdRoute,
   AdminIndexRoute: AdminIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,

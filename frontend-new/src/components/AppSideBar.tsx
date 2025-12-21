@@ -1,4 +1,4 @@
-// import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import { Package, ShoppingCart, Tag, Filter, Check } from "lucide-react";
 
 import {
   Sidebar,
@@ -44,22 +44,23 @@ function AppSidebar({
 
 
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup className="mt-16 ">
+    <Sidebar className="border-r border-zinc-800 bg-black">
+      <SidebarContent className="px-2">
+        <SidebarGroup className="mt-8">
           <SidebarGroupLabel
             className={
               orderOpen
-                ? "cursor-pointer text-lg font-mono"
-                : "cursor-pointer bg-zinc-800 text-lg font-mono"
+                ? "flex items-center gap-2 px-3 text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 cursor-pointer hover:text-white transition-colors"
+                : "flex items-center gap-2 px-3 text-xs font-medium text-white uppercase tracking-wider mb-2 cursor-pointer"
             }
             onClick={() => setOrderOpen(false)}
           >
+            <Filter className="w-4 h-4" />
             Categories
           </SidebarGroupLabel>
 
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1">
               {prodCategories.map((item) => {
                 const isSelected = selectedCategories.includes(item);
 
@@ -68,15 +69,17 @@ function AppSidebar({
                     <SidebarMenuButton
                       onClick={() => toggleCategory(item)}
                       className={`
-                        cursor-pointer
-                        ${isSelected ? "bg-zinc-700 text-white" : "text-zinc-400"}
+                        w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200
+                        ${isSelected 
+                          ? "bg-zinc-800 text-white font-medium" 
+                          : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200"}
                       `}
                     >
-                      <span className="ps-4">{item}</span>
+                      <Tag className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{item}</span>
 
-                      {/* Optional UI indicator */}
                       {isSelected && (
-                        <span className="ml-auto text-xs opacity-70">✓</span>
+                        <Check className="ml-auto w-3 h-3 text-emerald-500" />
                       )}
                     </SidebarMenuButton>
 
@@ -86,23 +89,32 @@ function AppSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <Separator />
+        
+        <div className="my-4 px-3">
+             <Separator className="bg-zinc-800" />
+        </div>
+
         <SidebarGroup>
           <SidebarGroupLabel
             className={
               orderOpen
-                ? " bg-zinc-800 cursor-pointer font-mono text-lg"
-                : "cursor-pointer text-lg font-mono"
+                ? "flex items-center gap-2 px-3 text-xs font-medium text-white uppercase tracking-wider mb-2 cursor-pointer"
+                : "flex items-center gap-2 px-3 text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 cursor-pointer hover:text-white transition-colors"
             }
             onClick={() => setOrderOpen(true)}
           >
+             <Package className="w-4 h-4" />
             Orders
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={()=>setDialogOpen(true)} className={" cursor-pointer text-zinc-400"}>
-                  <span className="ps-4" >Make a Custom Order</span>
+                <SidebarMenuButton 
+                    onClick={()=>setDialogOpen(true)} 
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200 transition-all duration-200"
+                >
+                  <Package className="w-4 h-4" />
+                  <span>Make a Custom Order</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -112,14 +124,23 @@ function AppSidebar({
             />
           </SidebarGroupContent>
         </SidebarGroup>
-        <Separator />
+
+        <div className="my-4 px-3">
+             <Separator className="bg-zinc-800" />
+        </div>
+
         <SidebarGroup>
-          <SidebarGroupLabel
-            className={"text-lg font-mono hover:bg-zinc-800 cursor-pointer"}
-            onClick={() => nav({ to: "/cart/details" })}
-          >
-            View Cart
-          </SidebarGroupLabel>
+             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                    onClick={() => nav({ to: "/cart/details" })}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200 transition-all duration-200 group"
+                >
+                  <ShoppingCart className="w-4 h-4 group-hover:text-emerald-500 transition-colors" />
+                  <span className="font-medium group-hover:text-white">View Cart</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

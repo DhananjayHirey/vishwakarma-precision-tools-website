@@ -14,7 +14,7 @@ const features = [
     cta: "Learn more",
     background: (
       <img
-        src="https://images.unsplash.com/photo-1522199710521-72d69614c702?q=80&w=1000"
+        src="https://i.ibb.co/DHxF715j/Untitled-design-1.png"
         className="w-full h-full object-cover"
       />
     ),
@@ -24,7 +24,7 @@ const features = [
     Icon: TrophyIcon,
     name: "Testimonials",
     description: "Real stories from customers who love our products.",
-    href: "/",
+    href: "/testimonials",
     cta: "Learn more",
     background: (
       <img
@@ -38,7 +38,7 @@ const features = [
     Icon: GlobeIcon,
     name: "Our Customers",
     description: "Trusted by individuals and businesses across the globe.",
-    href: "/",
+    href: "/our-customers",
     cta: "Learn more",
     background: (
       <img
@@ -53,7 +53,7 @@ const features = [
     name: "Contact Us",
     description:
       "We’re here to help—reach out anytime for support or inquiries.",
-    href: "/",
+    href: "/contact",
     cta: "Learn more",
     background: (
       <img
@@ -67,7 +67,7 @@ const features = [
     Icon: StarIcon,
     name: "Why Choose Us?",
     description: "Exceptional quality, reliable service, and unmatched value.",
-    href: "/",
+    href: "/why-choose-us",
     cta: "Learn more",
     background: (
       <img

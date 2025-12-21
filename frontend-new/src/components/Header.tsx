@@ -41,6 +41,9 @@ export function Header() {
 	const navItems = [
 		// { name: "About", link: "/about" },
 		{ name: "Products", link: "/products" },
+        { name: "Why Us", link: "/why-choose-us" },
+        { name: "Testimonials", link: "/testimonials" },
+        { name: "Customers", link: "/our-customers" },
 		{ name: "Contact", link: "/contact" },
 	]
 

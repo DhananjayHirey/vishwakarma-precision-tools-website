@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import ProductDetails from "@/components/ProductDetails";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Search } from "lucide-react";
 import { RippleButton } from "@/components/ui/ripple-button";
+import { Input } from "@/components/ui/input";
 import { useApi } from "@/api/useFetch";
 import { getAllProducts } from "@/api/product.api";
 import { addToCart } from "@/api/cart.api";
@@ -43,6 +44,12 @@ function RouteComponent() {
   const [category, setCategory] = useState<any>([]);
   const [selectedCategories, setSelectedCategories] = useState<any>([]);
   const [orderOpen, setOrderOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = productsData.filter((prod: any) => 
+    prod.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    prod.category?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   const {
     call: getProductsCall,
     data: products,
@@ -132,7 +139,41 @@ function RouteComponent() {
         {!orderOpen && (
           <Drawer>
             <div>
-              <p className="text-2xl font-extrabold text-zinc-200 font-mono mt-24 ps-4">
+               <div className="mt-24 ps-4 pe-8 max-w-2xl">
+                 <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
+                    <Input 
+                      placeholder="Search products..." 
+                      className="pl-10 bg-zinc-900 border-zinc-700 text-white"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                 </div>
+               </div>
+
+               {searchQuery && (
+                  <>
+                     <p className="text-2xl font-extrabold text-zinc-200 font-mono mt-8 ps-4">
+                      Search Results
+                    </p>
+                    <div className="grid grid-cols-4 space-x-4 mt-2 space-y-4 ps-4">
+                        {filteredProducts.map((prod:any) => (
+                             <ProductCard
+                              imageUri="https://i.ibb.co/qM1kdnbt/517-BP179xk-L-UL500.jpg"
+                              prod={prod}
+                              setSelectedProduct={setSelectedProduct}
+                              key={prod._id}
+                            />
+                        ))}
+                        {filteredProducts.length === 0 && (
+                            <p className="text-zinc-500 col-span-4 mt-4">No products found.</p>
+                        )}
+                    </div>
+                     <div className="my-12 border-t border-zinc-800 mx-4" />
+                  </>
+               )}
+
+              <p className="text-2xl font-extrabold text-zinc-200 font-mono mt-8 ps-4">
                 All Products
               </p>
               <div className="grid grid-cols-4 space-x-4 mt-2 space-y-4 ps-4">

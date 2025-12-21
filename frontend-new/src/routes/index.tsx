@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 // import logo from "../logo.svg";
-import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { MagicCard } from "@/components/ui/magic-card";
-import { ImageSlider } from "@/components/ImageSlider";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { DashboardGrid } from "@/components/DashboardGrid";
+import { Footer } from "@/components/Footer";
 import AboutUs from "@/components/About";
 import { useState } from "react";
 import AuthModal from "@/components/AuthModal";
@@ -54,11 +53,8 @@ function App() {
             </div>
 
             <AboutUs />
-
-            <TextAnimate className="text-center text-3xl text-zinc-300 font-bold">
-                Our Customers
-            </TextAnimate>
-            <ImageSlider />
+            
+            <Footer />
         </>
     );
 }
