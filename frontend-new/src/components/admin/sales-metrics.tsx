@@ -115,7 +115,7 @@ export default function SalesMetrics() {
 
                                 {/* Right: Sales Count */}
                                 <p className="font-semibold text-green-600 dark:text-green-400">
-                                    {product.sales} sold
+                                    {product.sold} sold
                                 </p>
                             </div>
                         ))}
