@@ -57,14 +57,14 @@ export const getSalesMetrics = asyncHandler(async (req, res, next) => {
                 name: "$product.name",
                 price: "$product.price",
                 image: "$product.image",
-                sales: 1
+                sold: "$product.sales",
             }
         },
 
-        { $sort: { sales: -1 } },
+        { $sort: { sold: -1 } },
         { $limit: 5 }
     ]);
-
+    
     const topSellingProductsWithUrls =  await Promise.all(
         topProducts.map(async (product) => {
             const signedImageUrl = await getSignedUrlFromCloudinary(product.image, "image", "authenticated");
