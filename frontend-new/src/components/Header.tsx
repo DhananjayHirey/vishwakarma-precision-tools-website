@@ -60,7 +60,7 @@ export function Header() {
 						&lt;VP&gt;
 					</span>
 
-					<NavItems items={navItems} />
+					<NavItems className="" items={navItems} />
 
 					{/* Profile + Auth Actions */}
 					{!isAuthenticated ? (
